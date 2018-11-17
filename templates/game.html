@@ -4,6 +4,17 @@
 {% block title %}GAME{% endblock %}
 
 {% block content %}
-<h2>this will be the game</h2>
-<h3>{{word}}</h3>
+
+Please guess this {{length}} letter word<br>
+{% for letter_index in range(0,length) %} 
+
+	<span id={{letter_index}}>___</span> 
+{% endfor %}
+
+  <div>
+  	<form action='/check'>
+  	  Please Enter a Letter: <input type = "text" name="letter-input" maxlength=1 size=1 required>
+  	  <input type="submit" value="Submit">
+  	</form>
+  </div>
 {% endblock %}
