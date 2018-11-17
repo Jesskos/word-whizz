@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 from game import *
 
 app = Flask(__name__)
@@ -15,9 +15,11 @@ def play_game():
 	return render_template("game.html", length = length_word)
 
 
-@app.route('/check')
+@app.route('/check', methods=['GET'])
 def check():
-	letter = request.args.get('letter-input') 
+	print(f"\n\nRequest: GET {request.url}\n\n")
+	letter = request.args.get('letter') 
+	print(letter)
 	print("{} is the letter".format(letter))
 	if is_already_guessed_letter(letter):
 		return "You already guessed this letter"
