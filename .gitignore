@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 
 # C extensions
 *.so
@@ -89,6 +90,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+env_py3
 
 # Spyder project settings
 .spyderproject
@@ -102,3 +104,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# DS Store
+.DS_Store
+
+
