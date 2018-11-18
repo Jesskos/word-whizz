@@ -35,6 +35,9 @@ class Game:
 			print("Not calling API because words is not empty.")
 		return random.choice(Game.words)
 
+	def set_word():
+		''' a method used for testing to set a chosen word'''
+		self.word = "chocolate"
 
 	def get_word_length(self):
 		''' gets the length of the word'''
