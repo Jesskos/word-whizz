@@ -7,8 +7,24 @@ function checkLetter(evt) {
 	const letterChoice = {
 		'letter': $('#letter-input').val()
 	};
-	console.log(letterChoice)
+
 	$.get('/check', letterChoice, (results) => {
-		alert(results)
+		alert(results["message"]);
+		if (results.hasOwnProperty('indices')) {
+			let indices = results['indices'];
+			addLetter(indices, letterChoice['letter']);
+		};
+
 	});
+}
+
+function addLetter(indices, letter) {
+	console.log("inside add letters")
+	let i;
+	for (i=0; i<indices.length; i++){
+		console.log(i)
+		let itemId = indices[i];
+		console.log(itemId)
+		$(`#${itemId}`).html(letter);
+	};
 }

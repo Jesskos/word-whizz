@@ -1,4 +1,5 @@
 word = "chocolate"
+word_set = set(word)
 correct_guessed_letters = set()
 incorrect_guessed_letters = set()
 incorrect_guesses = 0 
@@ -42,7 +43,19 @@ def guesses_left():
 
 def game_over():
 	''' ends the game when the user exceeds allotted guesses'''
-	if remaining_guesses == 0:
+	if guesses_left() == 0:
+		return True
+	if len(word_set - correct_guessed_letters) == 0:
 		return True
 	else:
 		return False
+
+def get_indices_of_letter_in_word(letter):
+	indices_of_letter = []
+	for idx, char in enumerate(word):
+		if char == letter:
+			indices_of_letter.append(idx)
+	return indices_of_letter
+
+
+

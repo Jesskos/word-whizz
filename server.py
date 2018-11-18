@@ -17,19 +17,25 @@ def play_game():
 
 @app.route('/check', methods=['GET'])
 def check():
+	if game_over():
+		return jsonify({"message": "Game Over!"})
 	print(f"\n\nRequest: GET {request.url}\n\n")
 	letter = request.args.get('letter') 
 	print(letter)
 	print("{} is the letter".format(letter))
 	if is_already_guessed_letter(letter):
-		return "You already guessed this letter"
+		return jsonify({"message": "You already guessed the letter {}".format(letter)})
 	else:
 		checked_letter = check_letter(letter)
 		guesses_remaining = guesses_left()
+		indices_of_letter_in_word = get_indices_of_letter_in_word(letter)
 		if checked_letter:
-			return "Great Work! Correct Guess!"
+			return jsonify({"message": "Great Work! Correct Guess!", 
+				"indices": indices_of_letter_in_word})
 		else:
-			return "Sorry, Incorrect Guess! You have {} chances remaining".format(guesses_remaining)
+			return jsonify({"message": "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".
+				format(letter, guesses_remaining)})
+
 
 
 
