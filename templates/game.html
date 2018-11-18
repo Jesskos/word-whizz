@@ -11,12 +11,17 @@ Please guess this {{length}} letter word<br>
 	<span id={{letter_index}}>___</span> 
 {% endfor %}
 
-  <div>
+  <div> 
   	<form action='/check' id="letter-guessing-form">
-  	  Please Enter a Letter: <input id="letter-input" type = "text" name="letter-input" maxlength=1 size=1 required>
+  	  <label>Please Enter a Letter: </label><input id="letter-input" type = "text" name="letter-input" maxlength=1 size=1 required>
   	  <input type="submit" value="Submit">
   	</form>
   </div>
 
+  <div id="incorrect-letters-guessed">
+  	<h4> Incorrect Guesses So Far </h4>
+
+  </div>
   <script src="/static/js/game.js"></script>
+
 {% endblock %}

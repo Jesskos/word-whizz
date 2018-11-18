@@ -5,7 +5,6 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-
 	return render_template('index.html')
 
 @app.route('/play')
@@ -19,10 +18,7 @@ def play_game():
 def check():
 	if game_over():
 		return jsonify({"message": "Game Over!"})
-	print(f"\n\nRequest: GET {request.url}\n\n")
 	letter = request.args.get('letter') 
-	print(letter)
-	print("{} is the letter".format(letter))
 	if is_already_guessed_letter(letter):
 		return jsonify({"message": "You already guessed the letter {}".format(letter)})
 	else:

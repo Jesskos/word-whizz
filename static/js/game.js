@@ -13,7 +13,9 @@ function checkLetter(evt) {
 		if (results.hasOwnProperty('indices')) {
 			let indices = results['indices'];
 			addLetter(indices, letterChoice['letter']);
-		};
+		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
+			$("#incorrect-letters-guessed").append(letterChoice["letter"] + " ")
+		}
 
 	});
 }
