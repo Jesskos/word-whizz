@@ -1,6 +1,5 @@
 "use strict";
 
-$("#letter-guessing-form").on('submit', checkLetter)
 
 function checkLetter(evt) {
 	evt.preventDefault()
@@ -35,6 +34,4 @@ function addLetter(indices, letter) {
 	};
 }
 
-function showGuessesRemaining() {
-
-}
+$("#letter-guessing-form").on('submit', checkLetter)
