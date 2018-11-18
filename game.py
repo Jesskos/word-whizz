@@ -1,14 +1,13 @@
 class Game:
 	''' A class to define the game rules and logic'''
 
-	correct_guessed_letters = set()
-	incorrect_guessed_letters = set()
-	incorrect_guesses = 0 
-	max_incorrect_guesses = 3
-
 	def __init__(self):
 		self.word = "cho"
 		self.word_set = set(self.word)
+		self.correct_guessed_letters = set()
+		self.incorrect_guessed_letters = set()
+		self.incorrect_guesses = 0 
+		self.max_incorrect_guesses = 3
 
 	def get_word(self):
 		''' returns a word to guess'''
