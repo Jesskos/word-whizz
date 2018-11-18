@@ -6,10 +6,12 @@
 {% block content %}
 
 Please guess this {{length}} letter word<br>
-{% for letter_index in range(0,length) %} 
+   <div id="word-to-guess">
+		{% for letter_index in range(0,length) %} 
 
-	<span id={{letter_index}}>___</span> 
-{% endfor %}
+		<span id={{letter_index}}>___</span> 
+		{% endfor %}
+   </div> 
 
   <div> 
   	<form action='/check' id="letter-guessing-form">
@@ -22,6 +24,11 @@ Please guess this {{length}} letter word<br>
   	<h4> Incorrect Guesses So Far </h4>
 
   </div>
+
+  <div>
+  	<h4> You have <span id="num-remaining-guesses">{{guesses}}</span> remaining guesses</h4>
+  </div>
+
   <script src="/static/js/game.js"></script>
 
 {% endblock %}

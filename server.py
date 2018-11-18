@@ -1,7 +1,9 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, redirect, jsonify, flash, session
 from game import *
 
 app = Flask(__name__)
+word_game = Game()
+app.secret_key="Apple"
 
 @app.route('/')
 def index():
@@ -9,26 +11,31 @@ def index():
 
 @app.route('/play')
 def play_game():
-	word = get_word()
-	length_word = get_word_length()
-	return render_template("game.html", length = length_word)
+	global word_game
+	word_game = Game()
+	length_word = word_game.get_word_length()
+	remaining_guesses = word_game.guesses_left()
+	return render_template("game.html", length=length_word, guesses=remaining_guesses)
 
 
 @app.route('/check', methods=['GET'])
 def check():
-	if game_over():
-		return jsonify({"message": "Game Over!"})
+	if word_game.game_over():
+		return jsonify({"message":"The Game is over. Please choose to play again"})
 	letter = request.args.get('letter') 
-	if is_already_guessed_letter(letter):
+	if word_game.is_already_guessed_letter(letter):
 		return jsonify({"message": "You already guessed the letter {}".format(letter)})
 	else:
-		checked_letter = check_letter(letter)
-		guesses_remaining = guesses_left()
-		indices_of_letter_in_word = get_indices_of_letter_in_word(letter)
+		checked_letter = word_game.check_letter(letter)
+		guesses_remaining = word_game.guesses_left()
+		indices_of_letter_in_word = word_game.get_indices_of_letter_in_word(letter)
 		if checked_letter:
-			return jsonify({"message": "Great Work! Correct Guess!", 
-				"indices": indices_of_letter_in_word})
+			if word_game.win():
+				return jsonify({"message": "You win!", "indices": indices_of_letter_in_word})
+			return jsonify({"message": "Great Work! Correct Guess!", "indices": indices_of_letter_in_word})
 		else:
+			if word_game.lose():
+				return jsonify({"message":"Sorry, you have lost the game.", "remaining_guesses": word_game.guesses_left()})
 			return jsonify({"message": "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".
 				format(letter, guesses_remaining)})
 

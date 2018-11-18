@@ -9,13 +9,14 @@ function checkLetter(evt) {
 	};
 
 	$.get('/check', letterChoice, (results) => {
-		alert(results["message"]);
 		if (results.hasOwnProperty('indices')) {
 			let indices = results['indices'];
 			addLetter(indices, letterChoice['letter']);
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
-			$("#incorrect-letters-guessed").append(letterChoice["letter"] + " ")
-		}
+			$("#incorrect-letters-guessed").append(letterChoice["letter"] + " ");
+			$("#num-remaining-guesses").html(results["remaining_guesses"])
+		};	
+		alert(results["message"]);
 
 	});
 }
@@ -29,4 +30,8 @@ function addLetter(indices, letter) {
 		console.log(itemId)
 		$(`#${itemId}`).html(letter);
 	};
+}
+
+function showGuessesRemaining() {
+
 }
