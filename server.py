@@ -27,7 +27,7 @@ def check():
 		return jsonify({"message": "You already guessed the letter {}".format(letter)})
 	else:
 		checked_letter = word_game.check_letter(letter)
-		guesses_remaining = word_game.guesses_left()
+		remaining_guesses = word_game.guesses_left()
 		indices_of_letter_in_word = word_game.get_indices_of_letter_in_word(letter)
 		if checked_letter:
 			if word_game.win():
@@ -35,9 +35,11 @@ def check():
 			return jsonify({"message": "Great Work! Correct Guess!", "indices": indices_of_letter_in_word})
 		else:
 			if word_game.lose():
-				return jsonify({"message":"Sorry, you have lost the game.", "remaining_guesses": word_game.guesses_left()})
+				return jsonify({"message":"Sorry, you have lost the game.", "remaining_guesses": remaining_guesses, 
+					"word": word_game.get_word()})
+
 			return jsonify({"message": "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".
-				format(letter, guesses_remaining)})
+				format(letter, remaining_guesses), "remaining_guesses": remaining_guesses})
 
 
 

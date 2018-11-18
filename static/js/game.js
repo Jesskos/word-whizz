@@ -14,8 +14,11 @@ function checkLetter(evt) {
 			addLetter(indices, letterChoice['letter']);
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
 			$("#incorrect-letters-guessed").append(letterChoice["letter"] + " ");
-			$("#num-remaining-guesses").html(results["remaining_guesses"])
-		};	
+		} else if (results.hasOwnProperty('word')) {
+			$("#incorrect-letters-guessed").append(letterChoice["letter"])
+			$("div#word-to-guess").html(results["word"])
+		};
+		$("#num-remaining-guesses").html(results["remaining_guesses"])
 		alert(results["message"]);
 
 	});
