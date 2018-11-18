@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, jsonify, flash, session
 from game import *
+import requests
 
 app = Flask(__name__)
 word_game = Game()
@@ -24,9 +25,7 @@ def check():
 
 	if word_game.game_over():
 		return jsonify({"message":"The Game is over. Please choose to play again"})
-
 	letter = request.args.get('letter') 
-
 	if word_game.is_already_guessed_letter(letter):
 		return jsonify({"message": "You already guessed the letter {}".format(letter)})
 	else:
