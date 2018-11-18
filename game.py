@@ -1,8 +1,16 @@
+import random
+import requests
+
+WORD_URL = "http://app.linkedin-reach.io/words"
+
 class Game:
 	''' A class to define the game rules and logic'''
 
+	words = []
+
 	def __init__(self):
-		self.word = "cho"
+
+		self.word = Game.make_new_word()
 		self.word_set = set(self.word)
 		self.correct_guessed_letters = set()
 		self.incorrect_guessed_letters = set()
@@ -13,6 +21,23 @@ class Game:
 		''' returns a word to guess'''
 
 		return self.word
+
+	@staticmethod
+	def make_new_word():
+		''' a temporary method to get all the words from API at a certain difficulty level, and pick one at random'''
+		if not Game.words:
+			print("Calling API to get words")
+			payload = {"difficulty": "5"}
+			r = requests.get(WORD_URL, params=payload)
+			new_words = r.text.split("\n")
+			Game.words = new_words
+		else:
+			print("Not calling API because words is not empty.")
+		return random.choice(Game.words)
+
+	def set_word():
+		''' a method used for testing to set a chosen word'''
+		self.word = "chocolate"
 
 	def get_word_length(self):
 		''' gets the length of the word'''
@@ -60,14 +85,17 @@ class Game:
 
 
 	def win(self):
+		''' checks if player has won the game '''
 		if len(self.word_set - self.correct_guessed_letters) == 0:
 			return True
 		return False
 
 	def game_over(self):
+		''' checks to make sure the game is over so that the user does not play again with the same word'''
 		if self.win() or self.lose():
 			return True
 		return False
+
 
 
 
