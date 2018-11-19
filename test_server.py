@@ -19,7 +19,7 @@ class ServerTests(unittest.TestCase):
 		self.assertIn(b"Game", result.data)
 		self.assertEqual(result.status_code, 200)
 		
-
+	
 
 
 if __name__ == '__main__':  # pragma: no cover
