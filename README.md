@@ -1,2 +1,2 @@
 # reach-project
-A word guessing game
+A fun word guessing game
