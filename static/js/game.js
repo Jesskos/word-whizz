@@ -14,7 +14,7 @@ function checkLetter(evt) {
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
 			$("#incorrect-letters-guessed").append(letterChoice["letter"] + " ");
 		} else if (results.hasOwnProperty('word')) {
-			$("#incorrect-letters-guessed").append(letterChoice["letter"])
+			$("#incorrect-letters-guessed-list").append(letterChoice["letter" + " "])
 			$("div#word-to-guess").html(results["word"])
 		};
 		$("#num-remaining-guesses").html(results["remaining_guesses"])
