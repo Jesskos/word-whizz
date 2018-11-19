@@ -5,29 +5,37 @@
 
 {% block content %}
 
-Please guess this {{length}} letter word<br>
-   <div id="word-to-guess">
-		{% for letter_index in range(0,length) %} 
+<div class="container">
+  <h4>Please guess this {{length}} letter word</h4>
+</div>
 
-		<span id={{letter_index}}>___</span> 
-		{% endfor %}
-   </div> 
+   <div class="container">
+    <div id="word-to-guess-border">
+      <div id="word-to-guess">
+          {% for letter_index in range(0,length) %} 
+            <span id={{letter_index}}>___</span> 
+          {% endfor %}
+        </div>
+      </div>
+    </div>
 
-  <div> 
-  	<form action='/check' id="letter-guessing-form">
-  	  <label>Please Enter a Letter: </label><input id="letter-input" type = "text" name="letter-input" maxlength=1 size=1 required>
-  	  <input type="submit" value="Submit">
+  <div class="container"> 
+  	<form action='/check' id="letter-guessing-form" >
+  	  Guess a Letter: <input id="letter-input" type="text" name="letter-input" maxlength=1 required>
+  	  <input type="submit" value="Check">
   	</form>
   </div>
 
-  <div id="incorrect-letters-guessed">
-  	<h4> Incorrect Guesses So Far </h4>
-
+  <div class="container">
+    <h4>You have <span id="num-remaining-guesses">{{guesses}}</span> guesses left</h4>
   </div>
 
-  <div>
-  	<h4> You have <span id="num-remaining-guesses">{{guesses}}</span> remaining guesses</h4>
+  <div id="incorrect-letters-guessed" class="container-vertical">
+    <h4>Incorrect Letters Tried</h4>
+    <div id="incorrect-letters-guessed-list"></div>
   </div>
+
+
 
   <script src="/static/js/game.js"></script>
 
