@@ -17,14 +17,17 @@ class Game:
 		self.incorrect_guesses = 0 
 		self.max_incorrect_guesses = 6
 
+
 	def get_word(self):
 		''' returns a word to guess'''
 
 		return self.word
 
+
 	@staticmethod
 	def make_new_word():
 		''' a temporary method to get all the words from API at a certain difficulty level, and pick one at random'''
+
 		if not Game.words:
 			print("Calling API to get words")
 			payload = {"difficulty": "5"}
@@ -35,14 +38,17 @@ class Game:
 			print("Not calling API because words is not empty.")
 		return random.choice(Game.words)
 
+
 	def set_word():
 		''' a method used for testing to set a chosen word'''
+
 		self.word = "chocolate"
 
 	def get_word_length(self):
 		''' gets the length of the word'''
 
 		return len(self.word)
+
 
 	def check_letter(self,letter):
 		''' checks if the letter is in the word and adjusts the global lists and counters based on the response'''
@@ -56,6 +62,7 @@ class Game:
 			self.incorrect_guesses += 1 
 			return False
 
+
 	def is_already_guessed_letter(self,letter):
 		''' checks whether or not the letter has been previously gussed by the user'''
 
@@ -63,20 +70,17 @@ class Game:
 			return True 
 		return False
 
+
 	def guesses_left(self):
 		''' returns the remaining guesses''' 
 
 		remaining_guesses = self.max_incorrect_guesses - self.incorrect_guesses
 		return remaining_guesses
 
-	def lose(self):
-		''' ends the game when the user exceeds allotted guesses'''
-		if self.guesses_left() == 0:
-			return True
-		return False
 
 	def get_indices_of_letter_in_word(self, letter):
-		''' gets the indices of the chosen letter in a word ''' 
+		''' gets the indices of the chosen letter in a word '''
+
 		indices_of_letter = []
 		for idx, char in enumerate(self.word):
 			if char == letter:
@@ -86,12 +90,23 @@ class Game:
 
 	def win(self):
 		''' checks if player has won the game '''
+
 		if len(self.word_set - self.correct_guessed_letters) == 0:
 			return True
 		return False
 
+
+	def lose(self):
+		''' ends the game when the user exceeds allotted guesses'''
+
+		if self.guesses_left() == 0:
+			return True
+		return False
+
+
 	def game_over(self):
 		''' checks to make sure the game is over so that the user does not play again with the same word'''
+
 		if self.win() or self.lose():
 			return True
 		return False
