@@ -15,7 +15,7 @@ class Game:
 		self.correct_guessed_letters = set()
 		self.incorrect_guessed_letters = set()
 		self.incorrect_guesses = 0 
-		self.max_incorrect_guesses = 3
+		self.max_incorrect_guesses = 6
 
 	def get_word(self):
 		''' returns a word to guess'''
