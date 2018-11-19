@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, jsonify, flash, session
 from game import *
 import requests
+import model
 
 app = Flask(__name__)
 word_game = Game()
