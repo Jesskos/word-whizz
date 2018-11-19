@@ -26,13 +26,13 @@ class Score(db.Model):
 	date = db.Column(db.DateTime, nullable=False)
 	word = db.Column(db.String(20), nullable=False)
 	score = db.Column(db.Integer, nullable=False)
-	finished = db.Column(db.Integer, nullable=False)
+	completed = db.Column(db.Boolean, nullable=False)
 
 	def __repr__(self):
 		""" Provide helpful representation of score object when printed"""
 
-		return "<Score date={}  word={} word={} score={} finished={}>".format(self.score_id, 
-			self.date, self.word, self.score, self.finished) # pragma: no cover
+		return "<Score date={}  word={} word={} score={} completed={}>".format(self.score_id, 
+			self.date, self.word, self.score, self.completed) # pragma: no cover
 
 
 
