@@ -1,10 +1,12 @@
 from flask import Flask, request, render_template, redirect, jsonify, flash, session
+from Jinja2 import StrictUndefined
 from game import *
 import requests
 import model
 import helperfunctions
 
 app = Flask(__name__)
+pp.jinja_env.undefined = StrictUndefined
 word_game = Game()
 app.secret_key="w()r|)gvu&&"
 
