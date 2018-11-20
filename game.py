@@ -8,9 +8,10 @@ class Game:
 
 	words = {}
 
-	def __init__(self):
+	def __init__(self, difficulty_level="5"):
 
-		self.word = Game._make_new_word()
+		self.word = Game._make_new_word(difficulty_level=difficulty_level)
+		self.difficulty_level = difficulty_level
 		self.word_set = set(self.word)
 		self.correct_guessed_letters = set()
 		self.incorrect_guessed_letters = set()
@@ -24,7 +25,7 @@ class Game:
 
 
 	@staticmethod
-	def _make_new_word(difficulty_level="1"):
+	def _make_new_word(difficulty_level="5"):
 		''' a temporary method to get all the words from API at a certain difficulty level, and pick one at random'''
 		
 		if difficulty_level not in Game.words:
@@ -101,6 +102,9 @@ class Game:
 			return True
 		return False
 
+	def get_score(self):
+		''' gets the score at the end of the game'''
+		pass 
 
 
 

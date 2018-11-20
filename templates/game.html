@@ -5,6 +5,31 @@
 
 {% block content %}
 
+<!-- Change Difficulty -->
+
+  <div class="container-top">
+    <div>Difficulty Level:</div>
+    <div>
+      <form action='\play_again' id="difficulty-rating">
+        <select>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10</option>
+        </select>
+        <input type="submit" value="change">
+      </div>
+    </form>
+  </div>
+
+  <!-- Baord and Guess A Letter -->
+
   <div class="container">
     <h4>Please guess this <span id="word-length">{{length}}</span> letter word</h4>
   </div>
@@ -30,11 +55,12 @@
     </form>
   </div>
 
+ <!-- Incorrect Letters Storage -->
+
   <div id="incorrect-letters-guessed" class="container-vertical">
-    <h4>Incorrect Letters Tried</h4>
+    <div id="incorrect-guesses-tried"><h4>Incorrect Letters Tried</h4></div>
     <div id="incorrect-letters-guessed-list"></div>
   </div>
-
 
 
     <!-- Modal content -->

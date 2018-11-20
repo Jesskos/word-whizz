@@ -11,6 +11,7 @@ app.secret_key="Apple"
 def index():
 	return render_template('index.html')
 
+
 @app.route('/play')
 def play():
 	global word_game
@@ -20,12 +21,15 @@ def play():
 	remaining_guesses = word_game.guesses_left()
 	return render_template("game.html", length=length_word, guesses=remaining_guesses)
 
+
 @app.route('/play_again')
 def play_again():
-	print("in play again")
 	global word_game
-	word_game = Game()
-	print(word_game.get_word())
+	request.args.get('difficulty_level')
+	if difficulty_level:
+		word_game = Game(difficulty_level)
+	else:
+		word_game = Game()
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 	return jsonify({"word_length": length_word, "remaining_guesses":remaining_guesses})

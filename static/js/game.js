@@ -49,7 +49,7 @@ function checkLetter(evt) {
 
 
 function addLetter(indices, letter) {
-	// a helper functin to add letters to html by searing for element id
+	// a helper functin to add letters to html by searching for element id
 
 	let i;
 	for (i=0; i<indices.length; i++){
@@ -80,7 +80,7 @@ function closeModal(evt) {
 
 
 function getNewWord(evt) {
-	// dynamically renders a new word from the server when user chooses to play again
+	// dynamically gets a new word from the server when user chooses to play again
 
 	evt.preventDefault()
 	let modal = document.getElementById('play-modal');
@@ -95,6 +95,25 @@ function getNewWord(evt) {
  		$("#num-remaining-guesses").html(data.remaining_guesses)
  		$("#word-length").html(data.word_length)
   		});
+}
+
+
+function changeDifficulty(evt) {
+	//dynamically changes the difficulty of the word 
+
+	evt.preventDefault()
+	const difficultyChoice = {
+		'difficulty': $("#difficulty-rating").val()
+	};
+	console.log(difficultyChoice);
+	debugger;
+
+	$.get('/play_again', difficultyChoice, (results) =>
+
+	{
+
+	});
+
 }
 
 
