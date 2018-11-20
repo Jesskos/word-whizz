@@ -1,4 +1,4 @@
-/*game.html*/
+/*containers*/
 
 .container {
 	display: flex;
@@ -19,7 +19,7 @@
 
 .container-top {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	justify-content: left;
 	width: 100%;
 	padding-left: 10%;
@@ -38,11 +38,17 @@
 	border: 2px black solid;
 }
 
+/*word to guess*/
+
 #word-to-guess {
 	font-size: 30px;
 	text-align: center;
 	margin: auto;
 }
+
+
+
+/*buttons and forms*/
 
 #letter-guessing-form {
 	display: inline;
@@ -73,6 +79,16 @@ input[type=submit] {
 	width: 60px;
 }
 
+#reset-game-button {
+	font-size: 16px;
+	border-radius: 4px;
+	background-color: green;
+	color: white;
+	width: 120px;
+	height: 30px;
+}
+
+/*remaining guesses*/
 
 #num-remaining-guesses {
 	color: red;

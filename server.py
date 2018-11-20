@@ -14,12 +14,28 @@ def index():
 
 @app.route('/play')
 def play():
+	''' renders the initial page. If page is refreshed, maintains the original word and game'''
+
 	global word_game
-	word_game = Game()
-	print(word_game.get_word())
+	word = word_game.get_word()
+	print(word)
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
-	return render_template("game.html", length=length_word, guesses=remaining_guesses)
+
+	# if page is refreshed, also need to keep track of incorrect guessed letters and incides of correctly guessed letters
+	incorrect_guessed_letters = word_game.incorrect_guessed_letters
+	correctly_guessed_letters = word_game.correct_guessed_letters
+
+	# makes a dictioary of the index as key, and the letter as value
+	correctly_guessed_dictionary = {}
+	for letter in correctly_guessed_letters:
+		indices = word_game.get_indices_of_letter_in_word(letter)
+		for index in indices:
+			correctly_guessed_dictionary[index] = letter
+
+
+	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
+		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary)
 
 
 @app.route('/play_again')
