@@ -1,18 +1,31 @@
 from flask import Flask, request, render_template, redirect, jsonify, flash, session
-from Jinja2 import StrictUndefined
 from game import *
 import requests
 import model
 import helperfunctions
 
 app = Flask(__name__)
-pp.jinja_env.undefined = StrictUndefined
 word_game = Game()
 app.secret_key="w()r|)gvu&&"
 
 @app.route('/')
 def index():
 	return render_template('index.html')
+
+@app.route('/login')
+def log_in():
+	pass
+
+
+@app.route('/signup', methods=["POST"])
+def sign_up():
+	pass
+
+
+@app.route('/logout')
+def log_out():
+	pass 
+
 
 
 @app.route('/play')

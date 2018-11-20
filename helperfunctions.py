@@ -2,4 +2,6 @@
 # server helper functions
 #############################################################################
 
-import model
+def save_score(score):
+	pass
+	
