@@ -44,7 +44,7 @@ def check():
 	else:
 		# receives the chosen letter 
 		letter = request.args.get('letter') 
-		print(letter)
+		letter = letter.lower()
 
 		# checks if the letter in the word has already been guessed.
 		if word_game.is_already_guessed_letter(letter):
