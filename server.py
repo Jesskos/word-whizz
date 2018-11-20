@@ -5,7 +5,7 @@ import model
 
 app = Flask(__name__)
 word_game = Game()
-app.secret_key="Apple"
+app.secret_key="w()r|)gvu&&"
 
 @app.route('/')
 def index():
@@ -16,6 +16,8 @@ def index():
 def play():
 	''' renders the initial page. If page is refreshed, maintains the original word and game'''
 
+	# temporarily keeping difficulty level in this route to initialize until login is set up
+	session["difficulty_level"] = "3"
 	global word_game
 	word = word_game.get_word()
 	print(word)
@@ -33,20 +35,22 @@ def play():
 		for index in indices:
 			correctly_guessed_dictionary[index] = letter
 
-
+	print("word is {} and difficulty_level is {})".format(word, word_game.difficulty_level))
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
-		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary)
+		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
+		difficulty_level=session["difficulty_level"])
 
 
 @app.route('/play_again')
 def play_again():
 	global word_game
-	difficulty_level = request.args.get('difficulty-level')
-	if difficulty_level:
-		word_game = Game(difficulty_level)
+	new_difficulty_level = request.args.get('difficulty-level')
+	if new_difficulty_level:
+		word_game = Game(new_difficulty_level)
+		session['difficulty_level'] = new_difficulty_level
 	else:
-		word_game = Game()
-	print("{} is the difficulty_level and word is {}".format(difficulty_level, word_game.get_word()))
+		word_game = Game(session["difficulty_level"])
+	print("{} is the new difficulty_level and word is {} and difficulty is {}".format(new_difficulty_level, word_game.get_word(), session['difficulty_level']))
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 	return jsonify({"word_length": length_word, "remaining_guesses":remaining_guesses})

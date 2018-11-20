@@ -8,7 +8,7 @@ class Game:
 
 	words = {}
 
-	def __init__(self, difficulty_level="5"):
+	def __init__(self, difficulty_level="3"):
 
 		self.word = Game._make_new_word(difficulty_level=difficulty_level)
 		self.difficulty_level = difficulty_level
@@ -25,7 +25,7 @@ class Game:
 
 
 	@staticmethod
-	def _make_new_word(difficulty_level="5"):
+	def _make_new_word(difficulty_level="3"):
 		''' a temporary method to get all the words from API at a certain difficulty level, and pick one at random'''
 		
 		if difficulty_level not in Game.words:
