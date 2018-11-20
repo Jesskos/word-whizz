@@ -12,12 +12,23 @@ def index():
 	return render_template('index.html')
 
 @app.route('/play')
-def play_game():
+def play():
 	global word_game
 	word_game = Game()
+	print(word_game.get_word())
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 	return render_template("game.html", length=length_word, guesses=remaining_guesses)
+
+@app.route('/play_again')
+def play_again():
+	print("in play again")
+	global word_game
+	word_game = Game()
+	print(word_game.get_word())
+	length_word = word_game.get_word_length()
+	remaining_guesses = word_game.guesses_left()
+	return jsonify({"word_length": length_word, "remaining_guesses":remaining_guesses})
 
 
 @app.route('/check', methods=['GET'])
@@ -33,6 +44,7 @@ def check():
 	else:
 		# receives the chosen letter 
 		letter = request.args.get('letter') 
+		print(letter)
 
 		# checks if the letter in the word has already been guessed.
 		if word_game.is_already_guessed_letter(letter):

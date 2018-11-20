@@ -5,9 +5,13 @@
 
 {% block content %}
 
-<div class="container">
-  <h4>Please guess this {{length}} letter word</h4>
-</div>
+  <div class="container">
+    <h4>Please guess this <span id="word-length">{{length}}</span> letter word</h4>
+  </div>
+
+  <div class="container">
+    <h4>You have <span id="num-remaining-guesses">{{guesses}}</span> guesses left</h4>
+  </div>
 
    <div class="container">
     <div id="word-to-guess-border">
@@ -20,14 +24,10 @@
     </div>
 
   <div class="container"> 
-  	<form action='/check' id="letter-guessing-form" >
-  	  Guess a Letter: <input id="letter-input" type="text" name="letter-input" maxlength=1 required>
-  	  <input type="submit" value="Check">
-  	</form>
-  </div>
-
-  <div class="container">
-    <h4>You have <span id="num-remaining-guesses">{{guesses}}</span> guesses left</h4>
+    <form action='/check' id="letter-guessing-form" >
+      Guess a Letter: <input id="letter-input" type="text" name="letter-input" maxlength=1 required>
+      <input type="submit" value="Check">
+    </form>
   </div>
 
   <div id="incorrect-letters-guessed" class="container-vertical">
@@ -37,6 +37,28 @@
 
 
 
+    <!-- Modal content -->
+
+  <div class="modal" id="play-modal">
+
+    <div class="modal-content">
+        <center><div id="notification"></div></center>
+        <center><h3> Do you want to play again?</h3></center>
+        <div class="container">
+          <div>
+            <form id="form-content" action="/play_again">
+              <input type="submit" id="play-again" value="Yes">
+            </form>
+          </div>
+          <div>
+            <button id="no-play-again" type="button">No</button>
+          </div>
+        </div>
+    </div>
+
+  </div>
+
   <script src="/static/js/game.js"></script>
+
 
 {% endblock %}
