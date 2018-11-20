@@ -25,11 +25,12 @@ def play():
 @app.route('/play_again')
 def play_again():
 	global word_game
-	request.args.get('difficulty_level')
+	difficulty_level = request.args.get('difficulty-level')
 	if difficulty_level:
 		word_game = Game(difficulty_level)
 	else:
 		word_game = Game()
+	print("{} is the difficulty_level and word is {}".format(difficulty_level, word_game.get_word()))
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 	return jsonify({"word_length": length_word, "remaining_guesses":remaining_guesses})

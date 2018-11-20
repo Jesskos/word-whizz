@@ -10,8 +10,8 @@
   <div class="container-top">
     <div>Difficulty Level:</div>
     <div>
-      <form action='\play_again' id="difficulty-rating">
-        <select>
+      <form action="\play_again" id="change-difficulty">
+        <select id="difficulty-rating">
           <option value="1">1</option>
           <option value="2">2</option>
           <option value="3">3</option>
@@ -28,15 +28,19 @@
     </form>
   </div>
 
-  <!-- Baord and Guess A Letter -->
+  <!-- Informs Player of Word Length -->
 
   <div class="container">
     <h4>Please guess this <span id="word-length">{{length}}</span> letter word</h4>
   </div>
 
+  <!-- Informs Player of Remaining Guesses -->
+
   <div class="container">
     <h4>You have <span id="num-remaining-guesses">{{guesses}}</span> guesses left</h4>
   </div>
+
+  <!-- Game Board and Guess a Letter-->
 
    <div class="container">
     <div id="word-to-guess-border">
@@ -83,6 +87,8 @@
     </div>
 
   </div>
+
+  <!-- JavaScrpt File -->
 
   <script src="/static/js/game.js"></script>
 

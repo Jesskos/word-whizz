@@ -100,25 +100,28 @@ function getNewWord(evt) {
 
 function changeDifficulty(evt) {
 	//dynamically changes the difficulty of the word 
-
-	evt.preventDefault()
+	evt.preventDefault();
+	console.log("in changeDifficulty")
 	const difficultyChoice = {
-		'difficulty': $("#difficulty-rating").val()
+		'difficulty-level': $("#difficulty-rating").val()
 	};
 	console.log(difficultyChoice);
-	debugger;
-
-	$.get('/play_again', difficultyChoice, (results) =>
-
-	{
-
+	$("#word-to-guess").empty();
+	$("#incorrect-letters-guessed").empty()
+	$.get('/play_again', difficultyChoice, (results) => {
+		let letter_index;
+ 		for (letter_index=0; letter_index<results["word_length"]; letter_index++) {
+ 			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
+ 		};
+ 		$("#num-remaining-guesses").html(results["remaining_guesses"]);
+ 		$("#word-length").html(results["word_length"]);
 	});
-
 }
 
 
 $("#letter-guessing-form").on("submit", checkLetter);
 $("#no-play-again").on("click", closeModal);
 $("#play-again").on("click", getNewWord);
+$("#change-difficulty").on("submit", changeDifficulty);
 
 
