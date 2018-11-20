@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect, jsonify, flash, ses
 from game import *
 import requests
 import model
+import helperfunctions
 
 app = Flask(__name__)
 word_game = Game()
@@ -36,6 +37,7 @@ def play():
 			correctly_guessed_dictionary[index] = letter
 
 	print("word is {} and difficulty_level is {})".format(word, word_game.difficulty_level))
+
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
 		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
 		difficulty_level=session["difficulty_level"])
