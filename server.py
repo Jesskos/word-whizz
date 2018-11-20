@@ -1,31 +1,60 @@
 from flask import Flask, request, render_template, redirect, jsonify, flash, session
+from Jinja2 import StrictUndefined
 from game import *
 import requests
 import model
+import helperfunctions
 
 app = Flask(__name__)
+pp.jinja_env.undefined = StrictUndefined
 word_game = Game()
-app.secret_key="Apple"
+app.secret_key="w()r|)gvu&&"
 
 @app.route('/')
 def index():
 	return render_template('index.html')
 
+
 @app.route('/play')
 def play():
+	''' renders the initial page. If page is refreshed, maintains the original word and game'''
+
+	# temporarily keeping difficulty level in this route to initialize until login is set up
+	session["difficulty_level"] = "3"
 	global word_game
-	word_game = Game()
-	print(word_game.get_word())
+	word = word_game.get_word()
+	print(word)
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
-	return render_template("game.html", length=length_word, guesses=remaining_guesses)
+
+	# if page is refreshed, also need to keep track of incorrect guessed letters and incides of correctly guessed letters
+	incorrect_guessed_letters = word_game.incorrect_guessed_letters
+	correctly_guessed_letters = word_game.correct_guessed_letters
+
+	# makes a dictioary of the index as key, and the letter as value
+	correctly_guessed_dictionary = {}
+	for letter in correctly_guessed_letters:
+		indices = word_game.get_indices_of_letter_in_word(letter)
+		for index in indices:
+			correctly_guessed_dictionary[index] = letter
+
+	print("word is {} and difficulty_level is {})".format(word, word_game.difficulty_level))
+
+	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
+		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
+		difficulty_level=session["difficulty_level"])
+
 
 @app.route('/play_again')
 def play_again():
-	print("in play again")
 	global word_game
-	word_game = Game()
-	print(word_game.get_word())
+	new_difficulty_level = request.args.get('difficulty-level')
+	if new_difficulty_level:
+		word_game = Game(new_difficulty_level)
+		session['difficulty_level'] = new_difficulty_level
+	else:
+		word_game = Game(session["difficulty_level"])
+	print("{} is the new difficulty_level and word is {} and difficulty is {}".format(new_difficulty_level, word_game.get_word(), session['difficulty_level']))
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 	return jsonify({"word_length": length_word, "remaining_guesses":remaining_guesses})
@@ -44,7 +73,7 @@ def check():
 	else:
 		# receives the chosen letter 
 		letter = request.args.get('letter') 
-		print(letter)
+		letter = letter.lower()
 
 		# checks if the letter in the word has already been guessed.
 		if word_game.is_already_guessed_letter(letter):

@@ -20,7 +20,7 @@ function checkLetter(evt) {
 
 		// checks if letter was an incorrect guess, and adds incorrect choices to DOM
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
-			$("#incorrect-letters-guessed").append(letterChoice["letter"] + " ");
+			$("#incorrect-letters-guessed-list").append(letterChoice["letter"] + " ");
 			alert(results["message"]);
 		
 		// checks if user lost the game, and show modal to play again
@@ -49,7 +49,7 @@ function checkLetter(evt) {
 
 
 function addLetter(indices, letter) {
-	// a helper functin to add letters to html by searing for element id
+	// a helper functin to add letters to html by searching for element id
 
 	let i;
 	for (i=0; i<indices.length; i++){
@@ -80,12 +80,12 @@ function closeModal(evt) {
 
 
 function getNewWord(evt) {
-	// dynamically renders a new word from the server when user chooses to play again
+	// dynamically gets a new word from the server when user chooses to play again
 
 	evt.preventDefault()
 	let modal = document.getElementById('play-modal');
 		$("#word-to-guess").empty();
-		$("#incorrect-letters-guessed").empty()
+		$("#incorrect-letters-guessed-list").empty()
 		modal.style.display="none";
 	  $.get('/play_again', function (data) {
   		let letter_index;
@@ -98,8 +98,52 @@ function getNewWord(evt) {
 }
 
 
+function changeDifficulty(evt) {
+	//dynamically changes the difficulty of the word aby sending difficulty level to the server, returning a new work
+
+	evt.preventDefault();
+	console.log("in changeDifficulty")
+	const difficultyChoice = {
+		'difficulty-level': $("#difficulty-rating").val()
+	};
+	console.log(difficultyChoice);
+	$("#word-to-guess").empty();
+	$("#incorrect-letters-guessed-list").empty()
+	$.get('/play_again', difficultyChoice, (results) => {
+		let letter_index;
+ 		for (letter_index=0; letter_index<results["word_length"]; letter_index++) {
+ 			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
+ 		};
+ 		$("#num-remaining-guesses").html(results["remaining_guesses"]);
+ 		$("#word-length").html(results["word_length"]);
+	});
+}
+
+function makeNewGame(evt) {
+	// dynamically changes the word, returning a new word at the same difficulty level
+
+	$("#word-to-guess").empty();
+	$("#incorrect-letters-guessed-list").empty()
+	$.get('/play_again', function (data) {
+  		let letter_index;
+ 		for (letter_index=0; letter_index<data.word_length; letter_index++) {
+ 			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
+ 		};
+ 		$("#num-remaining-guesses").html(data.remaining_guesses)
+ 		$("#word-length").html(data.word_length)
+  		});
+}
+
+
+
+
+
 $("#letter-guessing-form").on("submit", checkLetter);
 $("#no-play-again").on("click", closeModal);
 $("#play-again").on("click", getNewWord);
+$("#change-difficulty").on("submit", changeDifficulty);
+$("#reset-game-button").on("click", makeNewGame);
+
+
 
 
