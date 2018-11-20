@@ -17,6 +17,7 @@ class Game:
 		self.incorrect_guessed_letters = set()
 		self.incorrect_guesses = 0 
 		self.max_incorrect_guesses = 6
+		self.total_score = 0
 
 	def get_word(self):
 		''' returns a word to guess'''
@@ -75,6 +76,7 @@ class Game:
 
 	def lose(self):
 		''' ends the game when the user exceeds allotted guesses'''
+
 		if self.guesses_left() == 0:
 			return True
 		return False
@@ -82,6 +84,7 @@ class Game:
 
 	def get_indices_of_letter_in_word(self, letter):
 		''' gets the indices of the chosen letter in a word ''' 
+
 		indices_of_letter = []
 		for idx, char in enumerate(self.word):
 			if char == letter:
@@ -91,6 +94,7 @@ class Game:
 
 	def win(self):
 		''' checks if player has won the game '''
+
 		if len(self.word_set - self.correct_guessed_letters) == 0:
 			return True
 		return False
@@ -98,13 +102,30 @@ class Game:
 
 	def game_over(self):
 		''' checks to make sure the game is over so that the user does not play again with the same word'''
+
 		if self.win() or self.lose():
 			return True
 		return False
 
+
 	def get_score(self):
 		''' gets the score at the end of the game'''
-		pass 
+
+		length_word = self.get_word_length()
+
+		base_score = length_word * self.max_incorrect_guesses
+		point_gains = len(self.correct_guessed_letters) * self.max_incorrect_guesses
+		point_losses = self.incorrect_guesses * self.max_incorrect_guesses
+		total_points = (point_gains - point_losses) * int(self.difficulty_level)
+
+		if self.game_over():
+			self.total_score = total_points
+
+		return self.total_score
+
+
+		 
+
 
 
 
