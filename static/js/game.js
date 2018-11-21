@@ -12,10 +12,12 @@ function checkLetter(evt) {
 
 	$.get('/check', letterChoice, (results) => {
 
+		// resets form so user does not have to delete letters
+		document.getElementById("letter-guessing-form").reset();
+
 		// checks if letter was a correct guess, and adds indices of letter to DOM
 		if (results["message"].includes("Correct Guess!")) {
-			let indices = results["indices"];
-			addLetter(indices, letterChoice['letter']);
+			addLetter(results["indices"], letterChoice['letter']);
 			alert(results["message"]);
 
 		// checks if letter was an incorrect guess, and adds incorrect choices to DOM
@@ -31,7 +33,8 @@ function checkLetter(evt) {
 
 		// checks if user won the game, and show modal to play again	
 		} else if (results["message"].includes("win")) {
-			showModal(results["message"]); 
+			addLetter(results["indices"], letterChoice['letter']);
+			showModal(results["message"], results["score"]); 
 
 		// checks if user already guessed a letter
 		} else if (results["message"].includes("You already guessed")) {
@@ -39,7 +42,7 @@ function checkLetter(evt) {
 
 		// checks if a user's game is already over
 		} else if (results["message"].includes("The game is over")) {
-			showModal(results["message"]); 
+			showModal(results["message"], results["score"]); 
 		};
 
 		// modified the guesses left
@@ -61,10 +64,11 @@ function addLetter(indices, letter) {
 }
 
 
-function showModal(notification) {
+function showModal(notification, score) {
 	// shows modal if the user wins or loses
 
 	$('#notification').html(notification);
+	$('#game-score').html(score);
 	let modal = document.getElementById('play-modal');
 	modal.style.display="block";
 }
