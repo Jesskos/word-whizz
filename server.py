@@ -1,8 +1,9 @@
 from flask import Flask, request, render_template, redirect, jsonify, flash, session
 from game import Game
 import requests
-import helperfunctions
 from model import connect_to_db, db, User, Score
+from datetime import datetime
+
 
 app = Flask(__name__)
 word_game = Game()
@@ -25,7 +26,6 @@ def log_in():
 	entered_password = request_info['InputPassword']
 	existing_user = User.query.filter(User.username==entered_username).first()
 	if not existing_user:
-		print("in if statement")
 		flash("Username does not exist. Please sign up or check your spelling")
 		return redirect("/")
 	else:
@@ -161,6 +161,10 @@ def check():
 				#player has won the game after guessing letter
 				if word_game.win():
 					game_response['message'] = "You win!"
+					save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), 
+						won=word_game.win())
+					db.session.add(save_game)
+					db.session.commit()
 				
 				#player correctly guessed letter, but has not yet won
 				else:
@@ -175,6 +179,10 @@ def check():
 				if word_game.lose():
 					game_response["message"] = "Sorry, you have lost the game."
 					game_response["word"] = word_game.get_word()
+					save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), 
+						won=word_game.win())					
+					db.session.add(save_game)
+					db.session.commit()
 
 				# the player guessed an incorrect letter, but still has more tries
 				else: 
