@@ -109,13 +109,16 @@ function changeDifficulty(evt) {
 	console.log(difficultyChoice);
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
+	$("#Difficulty").empty()
 	$.get('/play_again', difficultyChoice, (results) => {
+		console.log(results);
 		let letter_index;
  		for (letter_index=0; letter_index<results["word_length"]; letter_index++) {
  			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
  		};
  		$("#num-remaining-guesses").html(results["remaining_guesses"]);
  		$("#word-length").html(results["word_length"]);
+ 		$("#Difficulty").html(results["difficulty_level"])
 	});
 }
 

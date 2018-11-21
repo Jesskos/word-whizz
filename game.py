@@ -1,5 +1,6 @@
 import random
 import requests
+from datetime import datetime
 
 WORD_URL = "http://app.linkedin-reach.io/words"
 
@@ -113,10 +114,10 @@ class Game:
 
 		length_word = self.get_word_length()
 
-		base_score = length_word * self.max_incorrect_guesses
-		point_gains = len(self.correct_guessed_letters) * self.max_incorrect_guesses
-		point_losses = self.incorrect_guesses * self.max_incorrect_guesses
-		total_points = (point_gains - point_losses) * int(self.difficulty_level)
+		base_score = 10
+		point_gains = len(self.correct_guessed_letters) * 10
+		point_losses = self.incorrect_guesses * 1
+		total_points = (base_score + point_gains - point_losses) * int(self.difficulty_level)
 
 		if self.game_over():
 			self.total_score = total_points
@@ -124,6 +125,9 @@ class Game:
 		return self.total_score
 
 
+
+
+	
 		 
 
 

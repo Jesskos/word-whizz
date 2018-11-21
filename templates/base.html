@@ -25,22 +25,28 @@
 	        <a class="nav-link" href="#"> Rules </a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="/play"> Play </a>
+	        <a class="nav-link" href="/play">Play </a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="#">My Games</a>
+	        <a class="nav-link" href="/view_history">{{name}}'s Games</a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="#">Score Board</a>
+	        <a class="nav-link" href="/view_leaderboard">Leaders</a>
 	      </li>
 	    </ul>
 	    <span class="navbar-text">
-	        <a class="nav-link" href="/play">Log Out</a>
+	        <a class="nav-link" href="/logout">Log Out</a>
 	    </span>
 	  </div>
 	</nav>
+
+		<!-- Flash message-->
+	  {% for message in get_flashed_messages() %}
+   		<li>{{ message }}</li>
+  		{% endfor %}
 
 	<!-- Jinja Template Inheritance -->
   {% block content %} BASE {% endblock %}
 </body>
 </html>
+

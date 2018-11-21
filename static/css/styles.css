@@ -38,6 +38,14 @@
 	border: 2px black solid;
 }
 
+.container-login {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	height: auto;
+	margin: 1%;
+}
+
 /*word to guess*/
 
 #word-to-guess {
@@ -46,7 +54,16 @@
 	margin: auto;
 }
 
+#scores-container {
+	display: flex;
+	margin-left: 10%;
+	margin-right: 20%;
+}
 
+.scores {
+	display: flex;
+
+}
 
 /*buttons and forms*/
 
@@ -102,6 +119,7 @@ input[type=submit] {
  align-self: center;
 }
 
+
 /*
 modal information */
 .modal {
@@ -127,7 +145,25 @@ modal information */
     width: 60%;
 }
 
+/*signup page*/
 
+#signup {
+	margin-top: 5%;
+	width: 100%;
+	align-self: baseline;
+	margin-right: 5%;
+}
 
+#login {
+	margin-top: 5%;
+	width: 100%;
+	align-self: baseline;
+	margin: 5%;
+}
+
+.title {
+	text-align: center;
+	margin-top: 3%;
+}
 
 
