@@ -23,17 +23,27 @@ def log_in():
 	''' allows a user to login '''
 
 	print(request.form)
+	# Receiving information from form to log user into the game. 
+	#request.form returns an immutable MultiDict(). Used this method to convert.
+
 	request_info = request.form.to_dict()
 	entered_username = request_info['InputUsername']
 	entered_password = request_info['InputPassword']
 	existing_user = User.query.filter(User.username==entered_username).first()
+
+	# checks to make sure user exists before logging in
 	if not existing_user:
 		flash("Username does not exist. Please sign up or check your spelling")
 		return redirect("/")
+
+	# if user exists, checks to make .ure entered password matches corresponding password in database
+	# if so, logs user into the game. If they don't match, user is told to try again
+	# A new game object is instantiated when user logs in
 	else:
 		if existing_user.password == entered_password:
 			session["user_id"] = existing_user.user_id
 			session["name"] = existing_user.username
+			word_game = Game()
 			flash("you have successfully logged in")
 			return redirect("/play")
 		else:
@@ -47,25 +57,36 @@ def log_in():
 def sign_up():
 	''' allows a user to signup '''
 
+	# getting information from forms to sign up user to play game
 	new_username = request.form["SignUpInputEmail"]
 	new_password = request.form["SignUpPassword"]
 	confirm_password = request.form["ConfirmInputPassword"]
 	
 	print("new password {} new_username {}".format(new_password, new_username))
 
+	# checks if user is already existing user to prevent duplicate usernames
 	existing_user = User.query.filter_by(username=new_username).first()
 
+	# makes sure passwords are the same, and the selected username has not already been taken
+	# In the future, I plan to use password encryption, validation, and set passwprd limits to increase security
+	# A new game object is intantiated when user is confirmed and signs in
 	if new_password == confirm_password and not existing_user:
 		new_user = User(username = new_username, password=new_password, total_score=0)
 		db.session.add(new_user)
 		db.session.commit()
+
+		# adds user information directly to session, and instantiates a new word game which is added to session. 
 		session["user_id"] = new_user.user_id
+		session["name"] = new_user.username
+		word_game = Game()
 		return redirect("/play")
 
+	# checks to make sure passwords match
 	elif new_password != confirm_password:
 		flash("Passwords do not match")
 		return redirect("/")
 
+	# if user already exists, triggered to create a new account
 	else:
 		flash("User Already Exists. Please create a new username")
 		return redirect("/")
@@ -75,32 +96,39 @@ def sign_up():
 def log_out():
 	''' logs a user out of the portal'''
 
+	# removes user_id from session, along with the word_game so it is not repeated for other users
 	if "user_id" in session:
 		del session["user_id"]
+		del session["name"]
+		del session["difficulty_level"]
 		flash("You have now logged out")
 		return redirect("/")
 
 
 @app.route('/play')
 def play():
-	''' renders the initial page. If page is refreshed, maintains the original word and game'''
+	''' renders the initial page. Session maintains word. If page is refreshed, maintains the original word and game'''
 
+	#creates a session with a default difficulty level
+	# in the future, the user will be able to choose a default difficulty level when registering/signing up and change it in his/her profile
+	session["difficulty_level"] = "3"
+
+	# if user is not logged in, redirectsback to homepage
 	if "user_id" not in session:
 		return redirect("/")
 
-	# temporarily keeping difficulty level in this route to initialize until login is set up
-	session["difficulty_level"] = "3"
+	#gets global variable wordgame
 	global word_game
 	word = word_game.get_word()
-	print(word)
+	
+	# gets length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses for templating
+	# when page is refreshed, game will maintain where it left off
+	incorrect_guessed_letters = word_game.incorrect_guessed_letters
+	correctly_guessed_letters = word_game.correct_guessed_letters
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 
-	# if page is refreshed, also need to keep track of incorrect guessed letters and incides of correctly guessed letters
-	incorrect_guessed_letters = word_game.incorrect_guessed_letters
-	correctly_guessed_letters = word_game.correct_guessed_letters
-
-	# makes a dictioary of the index as key, and the letter as value
+	# makes a dictioary of the index as key, and the letter as values so that if the page is refreshed, letter location on board is maintained
 	correctly_guessed_dictionary = {}
 	for letter in correctly_guessed_letters:
 		indices = word_game.get_indices_of_letter_in_word(letter)
@@ -109,6 +137,7 @@ def play():
 
 	print("word is {} and difficulty_level is {})".format(word, word_game.difficulty_level))
 
+	# sends over variables to be used for initial Jinja templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
 		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
 		difficulty_level=session["difficulty_level"], name=session["name"])
@@ -116,17 +145,29 @@ def play():
 
 @app.route('/play_again')
 def play_again():
+	''' a route that responds to an AJAX call from the browser to refresh the word '''
 
+	# gets the global variable word_game 
 	global word_game
+
+	# checks if user changed the difficulty level
 	new_difficulty_level = request.args.get('difficulty-level')
+
+	# if the user changed the difficulty level, instantiates a new game with the new difficutly level as an argument
 	if new_difficulty_level:
 		word_game = Game(new_difficulty_level)
 		session['difficulty_level'] = new_difficulty_level
+
+	# if the user does not choose a new difficulty level, instantiates a new game with the current difficulty level from session as an argument
 	else:
 		word_game = Game(session["difficulty_level"])
+
 	print("{} is the new difficulty_level and word is {} and difficulty is {}".format(new_difficulty_level, word_game.get_word(), session['difficulty_level']))
+
+	# gets the length of the word and remaining guesses to send to browser to modify DOM for new word
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
+
 	return jsonify({"word_length": length_word, "remaining_guesses":remaining_guesses, "difficulty_level": session['difficulty_level']})
 
 
@@ -200,10 +241,6 @@ def view_leaderboard():
 	if "user_id" not in session:
 		return redirect("/")
 
-	results = db.session.query(Score.user_id,label('total_score', func.sum(Score.score))).group_by(Score.user_id).order_by(desc('total_score')).all()
-	for result in results:
-		username = User.query.filter(User.user_id==result[0]).first().username
-		result.append(username)
 
 	return render_template('leaderboard.html', name=session["name"])
 

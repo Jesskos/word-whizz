@@ -54,7 +54,7 @@ def connect_to_db(app, uri='postgresql:///scoresdb'): # pragma: no cover
 if __name__ == "__main__":
 	from server import app
 	from sqlalchemy.sql import label
-	from sqlalchemy import func
+	from sqlalchemy import func, desc
 
 	#from server import app  # pragma: no cover
 	connect_to_db(app)  # pragma: no cover
