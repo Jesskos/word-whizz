@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-
 db = SQLAlchemy()
 
 class User(db.Model):
@@ -53,7 +52,10 @@ def connect_to_db(app, uri='postgresql:///scoresdb'): # pragma: no cover
 
 
 if __name__ == "__main__":
+	from server import app
+	from sqlalchemy.sql import label
+	from sqlalchemy import func
 
 	#from server import app  # pragma: no cover
-	#connect_to_db(app)  # pragma: no cover
+	connect_to_db(app)  # pragma: no cover
 	print("Connected to DB.")  # pragma: no cover

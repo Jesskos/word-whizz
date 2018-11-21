@@ -4,7 +4,16 @@
 {% block title %}Score History{% endblock %}
 
 {% block content %}
-	
+	<div class="container"><h3>{{name}}'s Wonderful Word Score History<h3></div>
+	<hr>
+	<div id="scores-container">
+		{% for game in game_history %}
+			<li>{{game.date.month}} / {{game.date.day}} / {{ game.date.year}}
+			{{game.score}}
+			{{game.word}}</li>
+			<hr>
+		{% endfor %}
+	</div>
 
 	
 {% endblock %}

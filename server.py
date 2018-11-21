@@ -3,6 +3,8 @@ from game import Game
 import requests
 from model import connect_to_db, db, User, Score
 from datetime import datetime
+from sqlalchemy.sql import label
+from sqlalchemy import func, desc
 
 
 app = Flask(__name__)
@@ -198,7 +200,12 @@ def view_leaderboard():
 	if "user_id" not in session:
 		return redirect("/")
 
-	return render_template('leaderboard.html')
+	results = db.session.query(Score.user_id,label('total_score', func.sum(Score.score))).group_by(Score.user_id).order_by(desc('total_score')).all()
+	for result in results:
+		username = User.query.filter(User.user_id==result[0]).first().username
+		result.append(username)
+
+	return render_template('leaderboard.html', name=session["name"])
 
 
 @app.route('/view_history')
@@ -207,7 +214,12 @@ def view_game_history():
 	if "user_id" not in session:
 		return redirect("/")
 
-	return render_template('history.html')
+	games_history_for_user = Score.query.filter(Score.user_id==session["user_id"]).all()
+
+	for i in games_history_for_user:
+		print(i)
+
+	return render_template('history.html', game_history=games_history_for_user, name=session["name"])
 
 
 

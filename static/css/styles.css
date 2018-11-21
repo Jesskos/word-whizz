@@ -54,7 +54,16 @@
 	margin: auto;
 }
 
+#scores-container {
+	display: flex;
+	margin-left: 10%;
+	margin-right: 20%;
+}
 
+.scores {
+	display: flex;
+
+}
 
 /*buttons and forms*/
 
@@ -109,6 +118,7 @@ input[type=submit] {
 #incorrect-guesses-tried {
  align-self: center;
 }
+
 
 /*
 modal information */
