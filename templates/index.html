@@ -17,36 +17,36 @@
 
 	   <div id="login">
 	   		<h1>Log In</h1>
-			<form id="login-form">
+			<form action="/login" method="POST">
 			  <div class="form-group">
-			    <label for="InputEmail">Email address</label>
-			    <input type="email" class="form-control" id="InputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+			    <label for="InputUsername">Username</label>
+			    <input type="username" class="form-control" id="InputUsername" aria-describedby="emailHelp" placeholder="Enter username"  name="InputUsername">
 			  </div>
 			  <div class="form-group">
 			    <label for="InputPassword">Password</label>
-			    <input type="password" class="form-control" id="InputPassword" placeholder="Password">
+			    <input type="password" class="form-control" id="InputPassword" placeholder="Password" name="InputPassword">
 			  </div>
-			  <button type="submit" class="btn btn-primary">Submit</button>
+			  <input type="submit" class="btn btn-primary" value="Log In">
 			</form>
 		</div>
 
 
 		<div id="signup">
 			<h1>Sign Up</h1>
-			<form id="signup-form">
+			<form action="/signup" method="POST">
 			  <div class="form-group">
-			    <label for="SignUpInputEmail">Email address</label>
-			    <input type="email" class="form-control" id="SignUpInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+			    <label for="SignUpInputEmail">Username</label>
+			    <input type="username" class="form-control" id="SignUpInputEmail" aria-describedby="emailHelp" placeholder="Create a Fun Username" name="SignUpInputEmail">
 			  </div>
 			  <div class="form-group">
 			    <label for="SignUpPassword">Password</label>
-			    <input type="password" class="form-control" id="SignUpPassword" placeholder="Password">
+			    <input type="password" class="form-control" id="SignUpPassword" placeholder="Password" name="SignUpPassword">
 			  </div>
 			  <div class="form-group">
 			    <label for="ConfirmInputPassword">Confirm Password</label>
-			    <input type="password" class="form-control" id="ConfirmInputPassword" placeholder="Password">
+			    <input type="password" class="form-control" id="ConfirmInputPassword" placeholder="Confirm Password" name="ConfirmInputPassword">
 			  </div>
-			  <button type="submit" class="btn btn-primary">Submit</button>
+			  <input type="submit" class="btn btn-primary" value="Join">
 			</form>
 	   </div>
 
