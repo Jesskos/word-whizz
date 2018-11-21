@@ -249,11 +249,24 @@ def check():
 def view_leaderboard():
 	''' renders the template for the leaderboard'''
 
+	#redirects to homepage if user not logged in
 	if "user_id" not in session:
 		return redirect("/")
 
 
-	return render_template('leaderboard.html', name=session["name"])
+	sql = """SELECT SUM(score), scores.user_id, username 
+			FROM scores JOIN users USING (user_id)
+			GROUP BY scores.user_id, username 
+			ORDER BY SUM(score) DESC
+			"""
+			
+
+	cursor = db.session.execute(sql)
+
+	game_leaders = cursor.fetchall()
+
+
+	return render_template('leaderboard.html', name=session["name"], leaders=game_leaders)
 
 
 @app.route('/view_history')
@@ -262,12 +275,27 @@ def view_game_history():
 	if "user_id" not in session:
 		return redirect("/")
 
-	games_history_for_user = Score.query.filter(Score.user_id==session["user_id"]).all()
+	
+	sql = """SELECT word, won, score, date
+			FROM scores 
+			WHERE user_id= :user_id
+			ORDER BY date DESC
+			"""
 
-	for i in games_history_for_user:
-		print(i)
+	user_id = session["user_id"]
 
-	return render_template('history.html', game_history=games_history_for_user, name=session["name"])
+	cursor = db.session.execute(sql, {"user_id": user_id})
+
+	game_record = cursor.fetchall()
+
+	scores = []
+	for game in game_record:
+		scores.append(game.score)
+
+	sum_scores = sum(scores)
+
+
+	return render_template('history.html', game_history=game_record, name=session["name"], scores_total=sum_scores)
 
 
 

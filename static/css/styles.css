@@ -166,4 +166,21 @@ modal information */
 	margin-top: 3%;
 }
 
+/*leaderboard and history 
+*/
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 90%;
+    margin: 5%;
+}
 
+td, th {
+    border: 1px solid #011627;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #2EC4B6;
+}
