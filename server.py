@@ -43,7 +43,13 @@ def log_in():
 		if existing_user.password == entered_password:
 			session["user_id"] = existing_user.user_id
 			session["name"] = existing_user.username
-			word_game = Game()
+
+			#creates a session with a default difficulty level
+			# in the future, the user will be able to choose a default difficulty level when registering/signing up and change it in his/her profile
+			global word_game
+			session["difficulty_level"] = "3"
+			word_game = Game(session["difficulty_level"])
+
 			flash("you have successfully logged in")
 			return redirect("/play")
 		else:
@@ -78,6 +84,13 @@ def sign_up():
 		# adds user information directly to session, and instantiates a new word game which is added to session. 
 		session["user_id"] = new_user.user_id
 		session["name"] = new_user.username
+
+		#creates a session with a default difficulty level
+		# in the future, the user will be able to choose a default difficulty level when registering/signing up and change it in his/her profile
+		global word_game
+		session["difficulty_level"] = "3"
+		word_game = Game(session["difficulty_level"])
+
 		word_game = Game()
 		return redirect("/play")
 
@@ -108,10 +121,6 @@ def log_out():
 @app.route('/play')
 def play():
 	''' renders the initial page. Session maintains word. If page is refreshed, maintains the original word and game'''
-
-	#creates a session with a default difficulty level
-	# in the future, the user will be able to choose a default difficulty level when registering/signing up and change it in his/her profile
-	session["difficulty_level"] = "3"
 
 	# if user is not logged in, redirectsback to homepage
 	if "user_id" not in session:
@@ -155,8 +164,8 @@ def play_again():
 
 	# if the user changed the difficulty level, instantiates a new game with the new difficutly level as an argument
 	if new_difficulty_level:
-		word_game = Game(new_difficulty_level)
 		session['difficulty_level'] = new_difficulty_level
+		word_game = Game(new_difficulty_level)
 
 	# if the user does not choose a new difficulty level, instantiates a new game with the current difficulty level from session as an argument
 	else:
@@ -204,6 +213,7 @@ def check():
 				#player has won the game after guessing letter
 				if word_game.win():
 					game_response['message'] = "You win!"
+					game_response["score"] = word_game.get_score()
 					save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), 
 						won=word_game.win())
 					db.session.add(save_game)
@@ -222,6 +232,7 @@ def check():
 				if word_game.lose():
 					game_response["message"] = "Sorry, you have lost the game."
 					game_response["word"] = word_game.get_word()
+					game_response["score"] = word_game.get_score()
 					save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), 
 						won=word_game.win())					
 					db.session.add(save_game)
