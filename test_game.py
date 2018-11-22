@@ -10,7 +10,7 @@ class GameTests(unittest.TestCase):
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
-		Attributes set up to test for a player who can neither win nor lose the game '''
+		Attributes set up to test when a player who can neither win nor lose the game '''
 
 		self.word_game=Game()
 		self.word_game.word=GameTests.TEST_WORD
@@ -100,6 +100,7 @@ class WinningGameTests(unittest.TestCase):
 		self.word_game=Game()
 		self.word_game.word=WinningGameTests.TEST_WORD
 		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
+		# set attribute correct_guessed_letters to include all letters in final word to test win() method
 		self.word_game.correct_guessed_letters = set(['c', 'o', 'h', 'l', 'a', 't', 'e'])
 		self.word_game.incorrect_guessed_letters = set(['i', 's'])
 		self.word_game.incorrect_guesses = 2 

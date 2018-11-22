@@ -80,8 +80,10 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 	def test_index_route(self):
 		''' integration test to make sure home page renders correct information '''
 
+	def test_index_route(self):
+		''' integration test to make sure home page renders correct information '''
 		result = self.client.get("/")
-		self.assertIn(b"Home Page", result.data)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
 
 
@@ -107,9 +109,6 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		result = self.client.get("/view_leaderboard", follow_redirects=True)
 		self.assertIn(b"Home Page", result.data)
 		self.assertEqual(result.status_code, 200)
-
-
-
 
 
 if __name__ == '__main__':  # pragma: no cover

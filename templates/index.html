@@ -1,10 +1,63 @@
-{% extends 'base.html' %}
+<html>
+<head>
+	<title>Sign Up/Log In Page</title>
+
+	<!-- Bootstrap Stylesheet -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+	<!-- Link to Stylesheet -->
+	<link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+	<!-- Flash Message -->
+	  {% for message in get_flashed_messages() %}
+    <li>{{ message }}</li>
+  		{% endfor %}
+
+	<div class="title"> 
+		<h1>Wild Word Warm-Up</h1>
+	</div>
+
+	<div class="container-login"> 
+
+	   <div id="login">
+	   		<h1>Log In</h1>
+			<form action="/login" method="POST">
+			  <div class="form-group">
+			    <label for="InputUsername">Username</label>
+			    <input type="username" class="form-control" id="InputUsername" aria-describedby="emailHelp" placeholder="Enter username"  name="InputUsername">
+			  </div>
+			  <div class="form-group">
+			    <label for="InputPassword">Password</label>
+			    <input type="password" class="form-control" id="InputPassword" placeholder="Password" name="InputPassword">
+			  </div>
+			  <input type="submit" class="btn btn-primary" value="Log In">
+			</form>
+		</div>
 
 
-{% block title %}Home Page{% endblock %}
+		<div id="signup">
+			<h1>Sign Up</h1>
+			<form action="/signup" method="POST">
+			  <div class="form-group">
+			    <label for="SignUpInputEmail">Username</label>
+			    <input type="username" class="form-control" id="SignUpInputEmail" aria-describedby="emailHelp" placeholder="Create a Fun Username" name="SignUpInputEmail">
+			  </div>
+			  <div class="form-group">
+			    <label for="SignUpPassword">Password</label>
+			    <input type="password" class="form-control" id="SignUpPassword" placeholder="Password" name="SignUpPassword">
+			  </div>
+			  <div class="form-group">
+			    <label for="ConfirmInputPassword">Confirm Password</label>
+			    <input type="password" class="form-control" id="ConfirmInputPassword" placeholder="Confirm Password" name="ConfirmInputPassword">
+			  </div>
+			  <input type="submit" class="btn btn-primary" value="Join">
+			</form>
+	   </div>
 
-{% block content %}
-<h2>this will be the homepage</h2>
+    </div>
 
 
-{% endblock %}
+</body>
+</html>

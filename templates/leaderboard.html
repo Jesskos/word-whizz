@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+
+ 	<center><h2> Game Leaders <h2></center>
+
+	<table>
+		<tr>
+			<th>Username</th>
+			<th>Total Points</th>
+			{% for leader in leaders %}
+			<tr>
+				<td>{{leader.username}}</td>
+				<td>{{leader.sum}}</td>
+		    </tr>
+
+			{% endfor %}
+	</table>	
+
+{% endblock %}

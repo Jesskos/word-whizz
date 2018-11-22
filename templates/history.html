@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Score History{% endblock %}
+
+{% block content %}
+	<center><h3>{{name}}'s Wonderful Word Score History<h3></center>
+
+	<table>
+		<tr>
+			<th>Date</th>
+			<th>Score</th>
+			<th>Word</th>
+			<th>Won?</th>
+		</tr>
+
+			{% for game in game_history %}
+			<tr>
+				<td>{{game.date.month}}/{{game.date.day}}/{{game.date.year}}</td>
+				<td>{{game.score}}</td>
+				<td>{{game.word}}</td>
+				{% if game.won == True %}
+					<td>Yes</td>
+				{% else %}
+					<td>No</td>
+				{% endif %}
+			</tr>
+			{% endfor %}
+
+	</table>
+
+	<center><h3>Total Score: {{scores_total}}</hr></center>
+
+{% endblock 
+
+	Score History
