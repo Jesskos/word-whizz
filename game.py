@@ -1,22 +1,24 @@
 import random
 import requests
+from datetime import datetime
 
 WORD_URL = "http://app.linkedin-reach.io/words"
 
 class Game:
 	''' A class to define the game rules and logic'''
 
-	words = []
+	words = {}
 
-	def __init__(self):
+	def __init__(self, difficulty_level="3"):
 
-		self.word = Game.make_new_word()
+		self.word = Game._make_new_word(difficulty_level=difficulty_level)
+		self.difficulty_level = difficulty_level
 		self.word_set = set(self.word)
 		self.correct_guessed_letters = set()
 		self.incorrect_guessed_letters = set()
 		self.incorrect_guesses = 0 
 		self.max_incorrect_guesses = 6
-
+		self.total_score = 0
 
 	def get_word(self):
 		''' returns a word to guess'''
@@ -25,24 +27,19 @@ class Game:
 
 
 	@staticmethod
-	def make_new_word():
+	def _make_new_word(difficulty_level="3"):
 		''' a temporary method to get all the words from API at a certain difficulty level, and pick one at random'''
-
-		if not Game.words:
+		
+		if difficulty_level not in Game.words:
 			print("Calling API to get words")
-			payload = {"difficulty": "5"}
+			payload = {"difficulty": difficulty_level}
 			r = requests.get(WORD_URL, params=payload)
 			new_words = r.text.split("\n")
-			Game.words = new_words
+			Game.words[difficulty_level] = new_words
 		else:
 			print("Not calling API because words is not empty.")
-		return random.choice(Game.words)
+		return random.choice(Game.words[difficulty_level])
 
-
-	def set_word():
-		''' a method used for testing to set a chosen word'''
-
-		self.word = "chocolate"
 
 	def get_word_length(self):
 		''' gets the length of the word'''
@@ -78,8 +75,16 @@ class Game:
 		return remaining_guesses
 
 
+	def lose(self):
+		''' ends the game when the user exceeds allotted guesses'''
+
+		if self.guesses_left() == 0:
+			return True
+		return False
+
+
 	def get_indices_of_letter_in_word(self, letter):
-		''' gets the indices of the chosen letter in a word '''
+		''' gets the indices of the chosen letter in a word ''' 
 
 		indices_of_letter = []
 		for idx, char in enumerate(self.word):
@@ -96,20 +101,34 @@ class Game:
 		return False
 
 
-	def lose(self):
-		''' ends the game when the user exceeds allotted guesses'''
-
-		if self.guesses_left() == 0:
-			return True
-		return False
-
-
 	def game_over(self):
 		''' checks to make sure the game is over so that the user does not play again with the same word'''
 
 		if self.win() or self.lose():
 			return True
 		return False
+
+
+	def get_score(self):
+		''' gets the score at the end of the game'''
+
+		length_word = self.get_word_length()
+
+		base_score = 10
+		point_gains = len(self.correct_guessed_letters) * 10
+		point_losses = self.incorrect_guesses * 1
+		total_points = (base_score + point_gains - point_losses) * int(self.difficulty_level)
+
+		if self.game_over():
+			self.total_score = total_points
+
+		return self.total_score
+
+
+
+
+	
+		 
 
 
 

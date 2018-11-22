@@ -5,38 +5,118 @@
 
 {% block content %}
 
-<div class="container">
-  <h4>Please guess this {{length}} letter word</h4>
-</div>
+  <div class="container-top">
+
+    <!-- Change Difficulty -->
+
+    <div>
+        Difficulty Level: <span id="Difficulty"> {{ difficulty_level }} </span>
+        <form action="\play_again" id="change-difficulty">
+          <select id="difficulty-rating">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+          <input type="submit" value="change">
+        </form>
+    </div>
+
+    <div>
+    </div>
+     <button id="reset-game-button" type="button">New Game</button>
+    </div>
+
+  <!-- Informs Player of Word Length -->
+
+  <div class="container">
+    <h4>Please guess this <span id="word-length">{{length}}</span> letter word</h4>
+  </div>
+
+  <!-- Informs Player of Remaining Guesses -->
+
+  <div class="container">
+    <h4>You have <span id="num-remaining-guesses">{{guesses}}</span> guesses left</h4>
+  </div>
+
+  <!-- Game Board and Guess a Letter-->
 
    <div class="container">
     <div id="word-to-guess-border">
       <div id="word-to-guess">
           {% for letter_index in range(0,length) %} 
-            <span id={{letter_index}}>___</span> 
+            {% if letter_index in correctly_guessed %}
+               <span id={{letter_index}}>{{correctly_guessed[letter_index]}}</span> 
+            {% else %}
+               <span id={{letter_index}}>___</span> 
+            {% endif %}
           {% endfor %}
         </div>
       </div>
     </div>
 
   <div class="container"> 
-  	<form action='/check' id="letter-guessing-form" >
-  	  Guess a Letter: <input id="letter-input" type="text" name="letter-input" maxlength=1 required>
-  	  <input type="submit" value="Check">
-  	</form>
+    <form action='/check' id="letter-guessing-form" >
+      Guess a Letter: <input id="letter-input" type="text" name="letter-input" maxlength=1 required>
+      <input type="submit" value="Check">
+    </form>
   </div>
 
-  <div class="container">
-    <h4>You have <span id="num-remaining-guesses">{{guesses}}</span> guesses left</h4>
-  </div>
+ <!-- Progress Bar -->
+
+<div id="myProgress">
+  <div id="myBar"></div>
+</div>
+
+ <!-- Incorrect Letters Storage -->
 
   <div id="incorrect-letters-guessed" class="container-vertical">
-    <h4>Incorrect Letters Tried</h4>
-    <div id="incorrect-letters-guessed-list"></div>
+    <div id="incorrect-guesses-tried"><h4>Incorrect Letters Tried</h4></div>
+    <div id="incorrect-letters-guessed-list">
+      {% for letter in incorrectly_guessed %}
+        <span>{{letter}}</span> 
+      {% endfor %}
+    </div>
+  </div>
+
+
+    <!-- Modal content -->
+
+  <div class="modal" id="play-modal">
+
+    <div class="modal-content">
+        <center><div id="notification"></div></center>
+        <center><div>Your score is <span id="game-score">.</span></div></center>
+        <center><h3> Do you want to play again?</h3></center>
+        <div class="container">
+          <div>
+            <form id="form-content" action="/play_again">
+              <input type="submit" id="play-again" value="Yes">
+            </form>
+          </div>
+          <div>
+            <button id="no-play-again" type="button">No</button>
+          </div>
+        </div>
+    </div>
+
   </div>
 
 
 
+
+  <!-- JavaScrpt File -->
+
   <script src="/static/js/game.js"></script>
+
+
+
+
 
 {% endblock %}

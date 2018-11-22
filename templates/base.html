@@ -1,11 +1,21 @@
 <html>
 <head>
 	<title>{% block title %}WORD GUESSING GAME{% endblock %}</title>
+
+	<!-- Bootstrap Stylesheet -->
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+	<!-- Link to Stylesheet -->
 	<link rel="stylesheet" href="/static/css/styles.css">
+
+	<!-- jquery script -->
 	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+
+	
 </head>
 <body>
+		<!-- Bootstrap Navbar -->
 
 	  <nav class="navbar navbar-expand-lg navbar-light bg-light">
 	  <a class="navbar-brand" href="#">Wild Word Warm-Up</a>
@@ -18,22 +28,28 @@
 	        <a class="nav-link" href="#"> Rules </a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="/play"> Play </a>
+	        <a class="nav-link" href="/play">Play </a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="#">My Games</a>
+	        <a class="nav-link" href="/view_history">{{name}}'s Games</a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="#">Score Board</a>
+	        <a class="nav-link" href="/view_leaderboard">Leaders</a>
 	      </li>
 	    </ul>
 	    <span class="navbar-text">
-	        <a class="nav-link" href="/play">Log Out</a>
+	        <a class="nav-link" href="/logout">Log Out</a>
 	    </span>
 	  </div>
 	</nav>
 
+		<!-- Flash message-->
+	  {% for message in get_flashed_messages() %}
+   		<li>{{ message }}</li>
+  		{% endfor %}
 
+	<!-- Jinja Template Inheritance -->
   {% block content %} BASE {% endblock %}
 </body>
 </html>
+
