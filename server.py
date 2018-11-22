@@ -57,8 +57,6 @@ def log_in():
 			return redirect("/")
 
 
-
-
 @app.route('/signup', methods=['POST'])
 def sign_up():
 	''' allows a user to signup '''
@@ -253,7 +251,8 @@ def view_leaderboard():
 	if "user_id" not in session:
 		return redirect("/")
 
-
+	# queries the database for sum, user_Id, and username, performing a join on the users and scores table,
+	# grouping by score sum by user_id
 	sql = """SELECT SUM(score), scores.user_id, username 
 			FROM scores JOIN users USING (user_id)
 			GROUP BY scores.user_id, username 
@@ -262,7 +261,6 @@ def view_leaderboard():
 			
 
 	cursor = db.session.execute(sql)
-
 	game_leaders = cursor.fetchall()
 
 
@@ -275,7 +273,7 @@ def view_game_history():
 	if "user_id" not in session:
 		return redirect("/")
 
-	
+	# queries the database for the word, score, and whether or not the user won in the 
 	sql = """SELECT word, won, score, date
 			FROM scores 
 			WHERE user_id= :user_id
@@ -283,15 +281,12 @@ def view_game_history():
 			"""
 
 	user_id = session["user_id"]
-
 	cursor = db.session.execute(sql, {"user_id": user_id})
-
 	game_record = cursor.fetchall()
 
 	scores = []
 	for game in game_record:
 		scores.append(game.score)
-
 	sum_scores = sum(scores)
 
 

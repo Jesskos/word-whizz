@@ -13,7 +13,7 @@ class ServerTests(unittest.TestCase):
 		''' integration test to make sure home page renders correct information '''
 
 		result = self.client.get("/")
-		self.assertIn(b"Home Page", result.data)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
 
 
@@ -25,12 +25,25 @@ class ServerTests(unittest.TestCase):
 		self.assertEqual(result.status_code, 200)
 
 
+	def test_view_history_route(self):
+		''' Integratin test to make sure game route renders correct infomration '''
+
+		result = self.client.get("/play")
+		self.assertIn(b"Score History", result.data)
+		self.assertEqual(result.status_code, 200)
+
 	def test_check_letter_not_present(self):
 		''' Integratin test to make sure game route renders correct inofmration '''
+
+		result = self.client.get("/view_leaderboard'")
+		self.assertIn(b"Leaderboard", result.data)
+		self.assertEqual(result.status_code, 200)
 
 
 	def test_check_letter_not_present(self):
 		''' Integratin test to make sure game route renders correct inofmration '''
+
+		pass
 
 
 if __name__ == '__main__':  # pragma: no cover
