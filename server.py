@@ -142,7 +142,7 @@ def play():
 		for index in indices:
 			correctly_guessed_dictionary[index] = letter
 
-	print("word is {} and difficulty_level is {})".format(word, word_game.difficulty_level))
+	print("word is {} and difficulty_level is {}".format(word, word_game.difficulty_level))
 
 	# sends over variables to be used for initial Jinja templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 

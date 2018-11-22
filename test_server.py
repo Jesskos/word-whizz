@@ -19,6 +19,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 			with c.session_transaction() as sess:
 				sess['user_id'] = 1
 				sess['difficulty_level'] = "3"
+				sess['name'] = "name"
 
 
 	def tearDown(self):
@@ -91,7 +92,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		''' Integratin test to make sure game route renders correct infomation '''
 
 		result = self.client.get("/play", follow_redirects=True)
-		self.assertIn(b"Home Page", result.data)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
 
 
@@ -99,7 +100,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		''' Integratin test to make sure game route renders correct information '''
 
 		result = self.client.get("/view_history", follow_redirects=True)
-		self.assertIn(b"Home Page", result.data)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
 
 
@@ -107,7 +108,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		''' Integratin test to make sure game route renders correct information '''
 
 		result = self.client.get("/view_leaderboard", follow_redirects=True)
-		self.assertIn(b"Home Page", result.data)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
 
 
