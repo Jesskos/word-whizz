@@ -19,7 +19,11 @@
 				<td>{{game.date.month}}/{{game.date.day}}/{{game.date.year}}</td>
 				<td>{{game.score}}</td>
 				<td>{{game.word}}</td>
-				<td>{{game.won}}</td>
+				{% if game.won == True %}
+					<td>Yes</td>
+				{% else %}
+					<td>No</td>
+				{% endif %}
 			</tr>
 			{% endfor %}
 

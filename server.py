@@ -188,7 +188,7 @@ def check():
 
 	#checks to make sure the game has not already ended
 	if word_game.game_over():
-		game_response["message"] = "The Game is over. Please choose to play again"
+		game_response["message"] = "The game is over. Please choose to play again"
 	# if not game over, carries out game logic
 	else:
 		# receives the chosen letter 

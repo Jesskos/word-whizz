@@ -23,13 +23,16 @@ function checkLetter(evt) {
 		// checks if letter was an incorrect guess, and adds incorrect choices to DOM
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
 			$("#incorrect-letters-guessed-list").append(letterChoice["letter"] + " ");
+			growAntiProgessBar(results["remaining_guesses"]);
 			alert(results["message"]);
 		
 		// checks if user lost the game, and show modal to play again
 		} else if (results["message"].includes("lost the game")) {
 			$("#incorrect-letters-guessed-list").append(letterChoice["letter" + " "]);
 			$("div#word-to-guess").html(results["word"]);
-			showModal(results["message"]);
+			growAntiProgessBar(results["remaining_guesses"]);
+			showModal(results["message"], results["score"]);
+
 
 		// checks if user won the game, and show modal to play again	
 		} else if (results["message"].includes("win")) {
@@ -86,11 +89,16 @@ function closeModal(evt) {
 function getNewWord(evt) {
 	// dynamically gets a new word from the server when user chooses to play again
 
+	// prevents default action of form
 	evt.preventDefault()
+
+	// hides modal if displayed
 	let modal = document.getElementById('play-modal');
 		$("#word-to-guess").empty();
 		$("#incorrect-letters-guessed-list").empty()
 		modal.style.display="none";
+
+	// gets data from server to load new word while on page, and replaces the html element with new word data
 	  $.get('/play_again', function (data) {
   		let letter_index;
  		for (letter_index=0; letter_index<data.word_length; letter_index++) {
@@ -105,15 +113,26 @@ function getNewWord(evt) {
 function changeDifficulty(evt) {
 	//dynamically changes the difficulty of the word aby sending difficulty level to the server, returning a new work
 
+	// prevents default action of form
 	evt.preventDefault();
+
+	// resets progress bar
+	let progressBar = document.getElementById("myBar");
+	progressBar.style.width = '0'
+
+	// sends difficulty choice to the server
 	console.log("in changeDifficulty")
 	const difficultyChoice = {
 		'difficulty-level': $("#difficulty-rating").val()
 	};
 	console.log(difficultyChoice);
+
+	// clears out contents of inccorrect letters, word that was previously guessed, and difficulty level
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
 	$("#Difficulty").empty()
+
+	// sends a request to get a new word from the browser, and adds to the DOM
 	$.get('/play_again', difficultyChoice, (results) => {
 		console.log(results);
 		let letter_index;
@@ -127,10 +146,17 @@ function changeDifficulty(evt) {
 }
 
 function makeNewGame(evt) {
-	// dynamically changes the word, returning a new word at the same difficulty level
+	// dynamically changes the word when user selects 'new game', returning a new word at the same difficulty level
 
+	// clears out old words and letters
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
+
+	// resets progress bar
+	let progressBar = document.getElementById("myBar");
+	progressBar.style.width = '0'
+
+	// gets new word from the server, and adds to the DOM
 	$.get('/play_again', function (data) {
   		let letter_index;
  		for (letter_index=0; letter_index<data.word_length; letter_index++) {
@@ -141,8 +167,15 @@ function makeNewGame(evt) {
   		});
 }
 
-
-
+function growAntiProgessBar(remainingGuesses) {
+	// grows an "antiprogress" bar when user with every incorrect guess
+	// growth calculated by 100/6, as 6 is the max incorrect guesses
+	
+	let antiProgressBar = document.getElementById("myBar");
+	antiProgressBar.style.width = '0'
+	let newWidth = 100 - (remainingGuesses * 17);
+	antiProgressBar.style.width = `${newWidth}%`;
+}
 
 
 $("#letter-guessing-form").on("submit", checkLetter);
