@@ -1,10 +1,10 @@
 # Word Whiz
-Word Whiz is a fun and educational word guessing game, similar to the "Hangman" game, whereby the computer challenges a player to guess a word. The player is given the length of the word, denoted by underlines, and the player guesses a letter. The player must guess the word with less than 6 incorrect letter guesses to win the game. Points are awarded for guessing letters correctly, even if the player loses, in order to encourage the player to continue guessing and learn new words. Fewer points are deducted if the player gueses incorrectly. A bar at the bottom of the page shows the proportion of guesses remaining. The player can adjust the difficulty level on a scale of 1-10 to receive more or less challenging words.
+Word Whiz is a fun and educational word guessing game, similar to the "Hangman" game, whereby the computer challenges a player to guess a word. The player is given the length of the word, in which the location of the possible letter are denoted by underlines, and the player guesses a letter. The player must guess the word with less than 6 incorrect letter guesses to win the game. Points are awarded for guessing letters correctly, even if the player loses, in order to encourage the player to continue guessing and learn new words. Fewer points are deducted if the player gueses incorrectly. A bar at the bottom of the page shows the proportion of guesses remaining. The player can adjust the difficulty level on a scale of 1-10 to receive more or less challenging words.
 
 
 ## Contents
-* [Game Guidelines](#game-guidelines)
 * [Technology Stack](#technology-stack)
+* [Game Guidelines](#game-guidelines)
 * [Features](#features)
 * [Design Decisions](#design-decisions)
 * [Setup](#setup)
@@ -23,12 +23,14 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
 
 ### Game Guidelines 
 * The player has 6 attempts to guess the word correctly. 
-* The computer deducts one attempt each time a guessed letter is not in the word.
+* The computer deducts one attempt each time a guessed letter is not in the word
 * The player can adjust difficulty level on a scale from 1-10, with 10 providing the most difficult words.
 * The computer sets difficulty level at 3 when the player logs in, but when the player adjusts difficulty level, it is maintained throughput the session.
 * The computer awards points for each correctly guessed letter.
 * The computer awards more points at higher word difficulty levels.
 * The computer will still award points if the player loses the game, but does not award points if the player does not finish the game.
+
+### SetUp
 
 ### Version 2.0
 Coming soon!!
