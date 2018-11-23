@@ -9,7 +9,6 @@ class User(db.Model):
 	user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 	username = db.Column(db.String(50), nullable=False)
 	password = db.Column(db.String(50), nullable=False)
-	total_score = db.Column(db.Integer, nullable=False)
 
 	def __repr__(self):
 		""" Provide helpful representation of user object when printed"""
@@ -30,7 +29,6 @@ class Score(db.Model):
 	won = db.Column(db.Boolean, nullable=False)
 
 	user = db.relationship("User", backref="Score")
-
 
 	def __repr__(self):
 		""" Provide helpful representation of score object when printed"""

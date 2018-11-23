@@ -75,7 +75,7 @@ def sign_up():
 	# In the future, I plan to use password encryption, validation, and set passwprd limits to increase security
 	# A new game object is intantiated when user is confirmed and signs in
 	if new_password == confirm_password and not existing_user:
-		new_user = User(username = new_username, password=new_password, total_score=0)
+		new_user = User(username = new_username, password=new_password)
 		db.session.add(new_user)
 		db.session.commit()
 
