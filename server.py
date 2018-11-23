@@ -6,13 +6,15 @@ from datetime import datetime
 from sqlalchemy.sql import label
 from sqlalchemy import func, desc
 
-
 app = Flask(__name__)
+
+# instantiating a new game
 word_game = Game()
 app.secret_key="w()r|)gvu&&"
 
 @app.route('/')
 def index():
+	# prevents a user who is logged in from viewing index route
 	if "user_id" in session:
 		return redirect("/play")
 
@@ -259,7 +261,7 @@ def view_leaderboard():
 			ORDER BY SUM(score) DESC
 			"""
 			
-
+	# executing the query, and fetching all records
 	cursor = db.session.execute(sql)
 	game_leaders = cursor.fetchall()
 
@@ -269,7 +271,9 @@ def view_leaderboard():
 
 @app.route('/view_history')
 def view_game_history():
+	''' a route that allows a user to view all records of game history'''
 
+	#redirecting to home if not logged in
 	if "user_id" not in session:
 		return redirect("/")
 
@@ -280,10 +284,12 @@ def view_game_history():
 			ORDER BY date DESC
 			"""
 
+	# gets the scores for a user using based on the user_id, and fethes all of the scores
 	user_id = session["user_id"]
 	cursor = db.session.execute(sql, {"user_id": user_id})
 	game_record = cursor.fetchall()
 
+	# getting the sum of the users scores
 	scores = []
 	for game in game_record:
 		scores.append(game.score)

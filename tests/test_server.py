@@ -9,24 +9,35 @@ class ServerTestsLoggedIn(unittest.TestCase):
 	''' A series of tests that tests all routes when a user is logged in, and a session added '''
 
 	def setUp(self):
+		''' runs before each test '''
 
 		# test_client simulates that the server is running
 		# app defined inside server
 		app.config['TESTING'] = True
+
+		# gets the flask test client
 		self.client = app.test_client()
+
+		# connects to a test database
 		connect_to_db(app, "postgresql:///testdb")
+
+		# creates tables with sample data
 		db.create_all()
 		example_data()
 
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = 1
+				sess['user_id'] = user.user_id
 				sess['difficulty_level'] = "3"
-				sess['name'] = "name"
+				sess['name'] = user.username
 
 
 	def tearDown(self):
-		db.session.remove()
+		''' runs after each test '''
+
+		db.session.close()
 		db.drop_all()
 
 
@@ -52,6 +63,10 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		result = self.client.get("/view_history")
 		self.assertIn(b"Game History", result.data)
 		self.assertEqual(result.status_code, 200)
+		self.assertIn(b"300", result.data)
+		self.assertIn(b"joyful", result.data)
+		self.assertNotIn(b"crystal", result.data)
+
 
 
 	def test_view_leaderboard_route_when_logged_in(self):
@@ -59,7 +74,12 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 		result = self.client.get("/view_leaderboard")
 		self.assertIn(b"Leaderboard", result.data)
-		self.assertEqual(result.status_code, 200)
+		self.assertIn(b"awesomewordguesses", result.data)
+		self.assertIn(b"500", result.data) 
+		self.assertIn(b"alwayswrite", result.data)
+		self.assertIn(b"500", result.data) 
+		self.assertIn(b"20", result.data)
+		self.assertNotIn(b"notinterested", result.data)
 
 
 	def test_log_out_when_logged_in(self):
@@ -75,6 +95,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 	and tests conditions when a user can be logged in or sign up '''
 
 	def setUp(self):
+		''' runs before each test '''
 
 		# test_client simulates that the server is running
 		# app defined inside server
@@ -86,7 +107,9 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 
 
 	def tearDown(self):
-		db.session.remove()
+		''' runs after each test '''
+
+		db.session.close()
 		db.drop_all()
 
 
@@ -111,7 +134,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		result = self.client.get("/view_history", follow_redirects=True)
 		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
-
+		
 
 	def test_view_leaderboard_route(self):
 		''' Integratin test to make sure leadboard route renders correct information when user is not logged in'''
@@ -191,6 +214,10 @@ class ServerTestsLeaderBoard(unittest.TestCase):
 
 
 
+
+
+
+
 #############################################################################################################################
 
 def example_data():
@@ -200,13 +227,17 @@ def example_data():
 	player2 = User(username="bestguesser", password="456def")
 	player3 = User(username="alwayswrite", password="789ghi")
 	player4 = User(username="notinterested", password="567")
-	score1 = Score(user_id=player1, date=datetime.now(), score=200, word="arduous", won=True)
-	score2 = Score(user_id=player1, date=datetime.now(), score=300, word="joyful", won=True)
-	score3 = Score(user_id=player2, date=datetime.now(), score=10, word="tedious", won=False)
-	score4 = Score(user_id=player2, date=datetime.now(), score=500, word="alacrity", won=True)
-	score5 = Score(user_id=player3, date=datetime.now(), score=350, word="crystal", won=True)
+	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True)
+	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=True)
+	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False)
+	score4 = Score(user=player2, date=datetime.now(), score=500, word="alacrity", won=True)
+	score5 = Score(user=player3, date=datetime.now(), score=20, word="crystal", won=False)
 
-	db.session.add_all([player1, player2])
+	players = [player1, player2, player3, player4]
+	scores = [score1, score2, score3, score4, score5]
+
+	db.session.add_all(players[:])
+	db.session.add_all(scores[:])
 	db.session.commit()
 
 

@@ -48,9 +48,8 @@ class Game:
 
 
 	def check_letter(self,letter):
-		''' checks if the letter is in the word and adjusts the global lists and counters based on the response'''
+		''' checks if the letter is in the word and adjusts the global list variable and incorrect_guesses counter variable based on the response'''
 
-		print("word is {} letter is {}".format(self.word, letter))
 		if letter in self.word and (letter not in self.incorrect_guessed_letters or letter not in self.correct_guessed_letters):
 			self.correct_guessed_letters.add(letter)
 			return True

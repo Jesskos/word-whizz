@@ -13,8 +13,8 @@ class User(db.Model):
 	def __repr__(self):
 		""" Provide helpful representation of user object when printed"""
 
-		return "<User user_id={}  username={} password={} total_score={}>".format(self.user_id, 
-			self.username, self.password, self.total_score) # pragma: no cover
+		return "<User user_id={}  username={} password={}>".format(self.user_id, 
+			self.username, self.password) # pragma: no cover
 
 class Score(db.Model):
 	''' keeps track of the score from each game'''
@@ -49,10 +49,8 @@ def connect_to_db(app, uri='postgresql:///scoresdb'): # pragma: no cover
 	db.create_all()
 
 
-if __name__ == "__main__":
-	from server import app
-	from sqlalchemy.sql import label
-	from sqlalchemy import func, desc
+if __name__ == "__main__": # pragma: no cover
+	from server import app # pragma: no cover
 
 	#from server import app  # pragma: no cover
 	connect_to_db(app)  # pragma: no cover
