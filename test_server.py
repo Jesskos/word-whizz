@@ -9,12 +9,19 @@ class ServerTestsLoggedIn(unittest.TestCase):
 	''' A series of tests that tests all routes when a user is logged in, and a session added '''
 
 	def setUp(self):
+		''' runs before each test '''
 
 		# test_client simulates that the server is running
 		# app defined inside server
 		app.config['TESTING'] = True
+
+		# gets the flask test client
 		self.client = app.test_client()
+
+		# connects to a test database
 		connect_to_db(app, "postgresql:///testdb")
+
+		# creates tables with sample data
 		db.create_all()
 		example_data()
 
@@ -26,6 +33,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def tearDown(self):
+		''' runs after each test '''
 		db.session.remove()
 		db.drop_all()
 
@@ -59,7 +67,6 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 		result = self.client.get("/view_leaderboard")
 		self.assertIn(b"Leaderboard", result.data)
-		self.assertEqual(result.status_code, 200)
 
 
 	def test_log_out_when_logged_in(self):
@@ -75,6 +82,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 	and tests conditions when a user can be logged in or sign up '''
 
 	def setUp(self):
+		''' runs before each test '''
 
 		# test_client simulates that the server is running
 		# app defined inside server
@@ -86,6 +94,8 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 
 
 	def tearDown(self):
+		''' runs after each test '''
+
 		db.session.remove()
 		db.drop_all()
 
@@ -188,6 +198,10 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 class ServerTestsLeaderBoard(unittest.TestCase):
 	''' A series of tests to test leaderboard and gamehistory routes and functionality '''
 
+	
+
+
+
 
 
 
@@ -206,7 +220,7 @@ def example_data():
 	score4 = Score(user_id=player2, date=datetime.now(), score=500, word="alacrity", won=True)
 	score5 = Score(user_id=player3, date=datetime.now(), score=350, word="crystal", won=True)
 
-	db.session.add_all([player1, player2])
+	db.session.add_all([player1, player2, player3, player4])
 	db.session.commit()
 
 

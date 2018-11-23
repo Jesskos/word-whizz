@@ -1,10 +1,12 @@
 from game import Game
 import unittest
 from unittest.mock import patch
+import requests
 
 
-class GameTests(unittest.TestCase):
-	''' unit tests for methods in Game class'''
+
+class GameTestsWhilePlaying(unittest.TestCase):
+	''' unit tests for methods in Game class for a user who makes a guess that neither causes winning or losing'''
 
 	TEST_WORD = "chocolate"
 
@@ -13,7 +15,7 @@ class GameTests(unittest.TestCase):
 		Attributes set up to test when a player who can neither win nor lose the game '''
 
 		self.word_game=Game()
-		self.word_game.word=GameTests.TEST_WORD
+		self.word_game.word=GameTestsWhilePlaying.TEST_WORD
 		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
 		self.word_game.correct_guessed_letters = set(['c', 'o'])
 		self.word_game.incorrect_guessed_letters = set(['i', 's'])
@@ -25,13 +27,13 @@ class GameTests(unittest.TestCase):
 	def test_get_word(self):
 		''' tests method get_word method '''
 
-		self.assertEqual(self.word_game.get_word(), GameTests.TEST_WORD)
+		self.assertEqual(self.word_game.get_word(), GameTestsWhilePlaying.TEST_WORD)
 	
 
 	def test_get_word_length(self):
 		'''tests method get_word_length '''
 
-		self.assertEqual(self.word_game.get_word_length(), len(GameTests.TEST_WORD))
+		self.assertEqual(self.word_game.get_word_length(), len(GameTestsWhilePlaying.TEST_WORD))
 
 
 	def test_check_letter_in_word(self):
@@ -82,14 +84,15 @@ class GameTests(unittest.TestCase):
 		self.assertEqual(self.word_game.lose(), False)
 
 
-
 	def test_game_over(self):
 		''' tests method game_over() when the player has not lost '''
 
 		self.assertEqual(self.word_game.game_over(), False)
 
+
+
 class WinningGameTests(unittest.TestCase):
-	''' unit tests for methods in Game class'''
+	''' unit tests for methods in Game class when a user has won'''
 
 	TEST_WORD = "chocolate"
 
@@ -102,6 +105,7 @@ class WinningGameTests(unittest.TestCase):
 		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
 		# set attribute correct_guessed_letters to include all letters in final word to test win() method
 		self.word_game.correct_guessed_letters = set(['c', 'o', 'h', 'l', 'a', 't', 'e'])
+		self.word_game.difficulty_level = 2
 		self.word_game.incorrect_guessed_letters = set(['i', 's'])
 		self.word_game.incorrect_guesses = 2 
 		self.word_game.max_incorrect_guesses = 6
@@ -109,7 +113,7 @@ class WinningGameTests(unittest.TestCase):
 
 
 	def test_win_when_player_wins(self):
-		''' tests route win() when a player should in the game'''
+		''' tests method win() when a player wins the game'''
 
 		self.assertEqual(self.word_game.win(), True)
 
@@ -126,8 +130,15 @@ class WinningGameTests(unittest.TestCase):
 		self.assertEqual(self.word_game.game_over(), True)
 
 
+	def test_get_score(self):
+		''' tests functionality of get_score method '''
+
+		self.assertEqual(self.word_game.get_score(), 156)
+
+
+
 class LosingGameTests(unittest.TestCase):
-	''' unit tests for methods in Game class'''
+	''' unit tests for methods in Game class when a user has lost'''
 
 
 	TEST_WORD = "chocolate"
@@ -138,9 +149,10 @@ class LosingGameTests(unittest.TestCase):
 
 		self.word_game=Game()
 		self.word_game.word=WinningGameTests.TEST_WORD
+		self.word_game.difficulty_level = 2
 		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
 		self.word_game.correct_guessed_letters = set(['c', 'o'])
-		self.word_game.incorrect_guessed_letters = set(['i', 's'])
+		self.word_game.incorrect_guessed_letters = set(['i', 's', 'd', 'f', 'g', 'z'])
 		self.word_game.incorrect_guesses = 6 
 		self.word_game.max_incorrect_guesses = 6
 		self.letters = ['c', 'f', 'g']
@@ -164,6 +176,50 @@ class LosingGameTests(unittest.TestCase):
 		self.assertEqual(self.word_game.game_over(), True)
 
 
+	def test_get_score(self):
+		''' tests functionality of score method '''
+
+		self.assertEqual(self.word_game.get_score(), 48)
+
+
+
+class ApiGameTest(unittest.TestCase):
+	''' test functionality of API, and finding words of appropriate difficulty_level'''
+
+
+	def setUp(self):
+		''' sets the attributes in the init method to perform tests
+		Attributes set up to test for a player who can win the game '''
+
+
+		words = {}
+		self.word_game = Game()
+		self.word_game.difficulty_level = "5"
+		self.word_game.word = self.word_game._make_new_word(difficulty_level=self.word_game.difficulty_level)
+
+
+	def test_API(self):
+		''' test that the API returns a response '''
+
+		result = requests.get("http://app.linkedin-reach.io/words")
+		self.assertEqual(result.status_code, 200)
+
+
+	def test_word_at_difficulty_level(self):
+		''' test that the API is creating a new word at a specified difficulty_level '''
+
+		payload = {"difficulty": self.word_game.difficulty_level}
+		response = requests.get("http://app.linkedin-reach.io/words", params=payload)
+
+		self.assertIn(self.word_game.word, response.text)
+
+
+
+
+
+
+
+		
 
 
 
