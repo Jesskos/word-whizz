@@ -39,7 +39,7 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
    * `createdb scoresdb`
 4. Run the server:
   * `python server.py`
- `localhost:5000` in the browser window
+ *`localhost:5000` in the browser window
 5. Check testing coverage by running the following: 
 	 *`coverage run --source ../ -m` 
 	 * coverage report
