@@ -45,7 +45,21 @@
 	margin: 1%;
 }
 
+
+/*Difficulty level
+*/#Difficulty {
+	color: blue;
+	font-size: 20px;
+}
+
+
+
 /*word to guess*/
+
+#word-length {
+	color: green;
+	font-size: 25px
+}
 
 #word-to-guess {
 	font-size: 30px;
