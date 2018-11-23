@@ -34,7 +34,7 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
 
 1. Clone the repository to a local directoy 
 2. After acitivating the virtual environment:
-	* `pip2 install requirements.txt`
+	* `pip3 install requirements.txt`
 3. Create the database:
    * `createdb scoresdb`
 4. Run the server:
