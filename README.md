@@ -4,6 +4,7 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
 
 ## Contents
 * [Technology Stack](#technology-stack)
+* [Dependencies](#dependencies)
 * [Game Guidelines](#game-guidelines)
 * [Features](#features)
 * [Design Decisions](#design-decisions)
@@ -11,7 +12,7 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
 * [Version 2.0](#version-2.0)
 * [About the Developer](#about-the-developer)
 
-### Technology Stack 
+### Technology Stack
 * Python3
 * Flask
 * Jinja2
@@ -19,6 +20,8 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
 * JavaScript (AJAX, JSON, jQuery)
 * HTML/CSS
 * Boostrap
+
+### DEPENDENCIES
 * API: LinkedIn's Word API
 
 ### Game Guidelines 
@@ -39,10 +42,11 @@ Word Whiz is a fun and educational word guessing game, similar to the "Hangman" 
    * `createdb scoresdb`
 4. Run the server:
   * `python server.py`
-  *`localhost:5000 in the browser window`
-5. Check testing coverage by running the following: 
-	 *`coverage run --source ../ -m` 
-	 * coverage report
+  * `localhost:5000 in the browser window`
+5. Check tests by running the following:
+	 * `python3 test_server.py`
+	 * `python3 test_game.py`
+
 
 
 
