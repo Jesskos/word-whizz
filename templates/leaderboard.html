@@ -9,12 +9,14 @@
 
 	<table>
 		<tr>
+			<th>Ranking</th>
 			<th>Username</th>
 			<th>Total Points</th>
-			{% for leader in leaders %}
+			{% for index in range(length) %}
 			<tr>
-				<td>{{leader.username}}</td>
-				<td>{{leader.sum}}</td>
+				<td>{{index + 1}}</td>
+				<td>{{leaders[index].username}}</td>
+				<td>{{leaders[index].sum}}</td>
 		    </tr>
 
 			{% endfor %}

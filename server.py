@@ -3,8 +3,7 @@ from game import Game
 import requests
 from model import connect_to_db, db, User, Score
 from datetime import datetime
-from sqlalchemy.sql import label
-from sqlalchemy import func, desc
+
 
 app = Flask(__name__)
 
@@ -266,7 +265,7 @@ def view_leaderboard():
 	game_leaders = cursor.fetchall()
 
 
-	return render_template('leaderboard.html', name=session["name"], leaders=game_leaders)
+	return render_template('leaderboard.html', name=session["name"], leaders=game_leaders, length=len(game_leaders))
 
 
 @app.route('/view_history')
