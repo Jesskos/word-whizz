@@ -243,7 +243,7 @@ class ServerTestsPageRefresh(unittest.TestCase):
 
 
 	def test_route_play(self):
-		''' '''
+		''' tests_route_play to make sure html renders appropriately'''
 
 		# mocking guessed letters
 		self.word_game = Game()
@@ -259,6 +259,27 @@ class ServerTestsPageRefresh(unittest.TestCase):
 			self.assertIn(b"<span id=0>___</span>", result.data)
 			self.assertNotIn(b"<span id=0>b</span>", result.data)
 
+
+	def test_route_play_after_user_loses(self):
+		''' tests_route_play after user loses '''
+
+		# mocking guessed letters
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['b', 'e'])
+		self.word_game.max_incorrect_guesses = 6
+		self.word_game.incorrect_guesses = 6
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/play")
+			self.assertEqual(self.word_game.guesses_left(), 0)
+			outcome = self.word_game.lose()
+			self.assertEqual(outcome, True)
+			self.assertIn(b"<span id=0>b</span>", result.data)
+			self.assertIn(b"<span id=1>e</span>", result.data)
+			self.assertIn(b"<span id=2>r</span>", result.data)
+			self.assertIn(b"<span id=3>r</span>", result.data)
+			self.assertIn(b"<span id=4>y</span>", result.data)
 
 
 class ServerTestsDifficultyLevel(unittest.TestCase):

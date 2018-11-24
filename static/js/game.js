@@ -3,13 +3,11 @@
 // checking a letter, and adding a letter to JavaScript based on element ID and index of letter in word
 
 function checkLetter(evt) {
+	// gets a letter from the form, and sends a request to the server
 	evt.preventDefault()
 	const letterChoice = {
 		'letter': $('#letter-input').val()
 	};
-
-	console.log(letterChoice)
-
 	$.get('/check', letterChoice, getUpdate)};
 
 

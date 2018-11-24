@@ -87,7 +87,7 @@
 input[type=text] {
     border: 2px solid black;
     border-radius: 4px;
-    width: 40%;
+    width: %;
     padding-left: 5px;
 }
 
@@ -211,7 +211,7 @@ tr:nth-child(even) {
 }
 
 #myBar {
-  width: {{bar_width}};
+  width: 0%;
   height: 30px;
   background-color: #ff4d4d;
   text-align: center;

@@ -154,12 +154,13 @@ def play():
 
 	print("word is {} and difficulty_level is {}".format(word, word_game.difficulty_level))
 
-	bar_width = 17 * (6-remaining_guesses)
+	adjust_bar_width = str(17 * (6-remaining_guesses)) + "%"
+	print(adjust_bar_width)
 
 	# sends over variables to be used for initial Jinja templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
 		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
-		difficulty_level=session["difficulty_level"], name=session["name"])
+		difficulty_level=session["difficulty_level"], name=session["name"], bar_width=adjust_bar_width)
 
 
 @app.route('/play_again')
@@ -254,11 +255,6 @@ def check():
 					game_response["message"] = "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".format(letter, remaining_guesses)
 
 	return jsonify(game_response)
-
-
-@app.route('/check_word')
-def check_word():
-	pass
 
 
 @app.route('/view_leaderboard')
