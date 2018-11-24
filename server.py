@@ -152,14 +152,9 @@ def play():
 		for letter_idx in range(len(word)):
 			correctly_guessed_dictionary[letter_idx] = word[letter_idx]
 
-
-
-	print(correctly_guessed_dictionary)
-
-	print("incorrect_guessed_letters={} correctly_guessed_letters={} length_word={} remaining_guesses={} correctly_guessed_letters={}".
-		format(incorrect_guessed_letters, correctly_guessed_letters, length_word, remaining_guesses, correctly_guessed_dictionary))
-
 	print("word is {} and difficulty_level is {}".format(word, word_game.difficulty_level))
+
+	bar_width = 17 * (6-remaining_guesses)
 
 	# sends over variables to be used for initial Jinja templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 

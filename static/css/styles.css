@@ -211,7 +211,7 @@ tr:nth-child(even) {
 }
 
 #myBar {
-  width: 0%;
+  width: {{bar_width}};
   height: 30px;
   background-color: #ff4d4d;
   text-align: center;
