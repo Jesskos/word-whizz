@@ -58,7 +58,8 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_view_history_route_when_logged_in(self):
-		''' Integratin test to make sure history route renders correct information when user is logged in '''
+		''' Integratin test to make sure history route renders correct information when user is logged in, 
+		and users scores and words are displayed on history '''
 
 		result = self.client.get("/view_history")
 		self.assertIn(b"Game History", result.data)
@@ -70,7 +71,8 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_view_leaderboard_route_when_logged_in(self):
-		''' Integratin test to make sure leaderboard route renders correct information when user is logged in '''
+		''' Integratin test to make sure leaderboard route renders correct information when user is logged in, 
+		and users from database are displayed on leaderboard if they have a score '''
 
 		result = self.client.get("/view_leaderboard")
 		self.assertIn(b"Leaderboard", result.data)
@@ -191,9 +193,9 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		''' Integration test to test that a user cannot log in with incorrect password'''
 
 		result = self.client.post("/login", data={'InputUsername': "bestguesser",
-													'InputPassword': '456def'}, 
+													'InputPassword': '456de'}, 
 													follow_redirects=True)
-		self.assertIn(b"Play Word Game", result.data)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
 
 
@@ -208,8 +210,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 
 
 
-class ServerTestsLeaderBoard(unittest.TestCase):
-	''' A series of tests to test leaderboard and gamehistory routes and functionality '''
+
 
 
 
