@@ -112,7 +112,7 @@ function getNewWord(evt) {
 
 
 function changeDifficulty(evt) {
-	//dynamically changes the difficulty of the word aby sending difficulty level to the server, returning a new work
+	//dynamically changes the difficulty of the word aby sending difficulty level to the server, returning a new word
 
 	// prevents default action of form
 	evt.preventDefault();
