@@ -1,12 +1,12 @@
 import unittest
 from game import *
-from server import app, db, connect_to_db
+from server import app, db, connect_to_db, session
 from model import User, Score
-
+from unittest.mock import patch
 #############################################################################################################################
 
 class ServerTestsLoggedIn(unittest.TestCase):
-	''' A series of tests that tests all routes when a user is logged in, and a session added '''
+	''' A series of tests that tests all routes that require a user to be logged in '''
 
 	def setUp(self):
 		''' runs before each test '''
@@ -25,6 +25,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		db.create_all()
 		example_data()
 
+		# adds a  user to the session from example_data to carry out routes that require log in
 		user = User.query.filter_by(username='awesomewordguesses').first()
 
 		with self.client as c:
@@ -67,7 +68,6 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		self.assertIn(b"300", result.data)
 		self.assertIn(b"joyful", result.data)
 		self.assertNotIn(b"crystal", result.data)
-
 
 
 	def test_view_leaderboard_route_when_logged_in(self):
@@ -210,12 +210,94 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 
 
 
+class ServerTestsPageRefresh(unittest.TestCase):
+	''' A series of tests to make sure that when page refreshes, letter locations on board are maintained '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+
+
+		# adds a user to the session to carry out routes while logged in
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = user.user_id
+				sess['difficulty_level'] = "3"
+				sess['name'] = user.username
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_route_play(self):
+		''' '''
+
+		# mocking guessed letters
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['r', 'e'])
+
+		# makes sure guessed letters are already in html
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/play")
+			self.assertIn(b"<span id=3>r</span>", result.data)
+			self.assertIn(b"<span id=2>r</span>", result.data)
+			self.assertIn(b"<span id=1>e</span>", result.data)
+			self.assertIn(b"<span id=0>___</span>", result.data)
+			self.assertNotIn(b"<span id=0>b</span>", result.data)
 
 
 
+class ServerTestsDifficultyLevel(unittest.TestCase):
+	''' A series of tests that tests that difficulty_level is changed '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+
+		# adds a user to the session to carry out routes while logged in
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = user.user_id
+				sess['difficulty_level'] = "3"
+				sess['name'] = user.username
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
 
 
+	# def test_new_difficulty_level(self):
+	# 	''' makes sure a thatt when the user selects a new difficulty level, the session updates '''
 
+	# 	result = self.client.get("/get-recipe.json", query_string={'difficulty_level': '8'})
+	# 	self.assertIn(b"Difficulty level: 8", result.data)
+	# 	self.assertNotIn(b"3", result.data)
 
 
 
