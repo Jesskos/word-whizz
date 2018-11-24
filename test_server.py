@@ -1,12 +1,12 @@
 import unittest
 from game import *
-from server import app, db, connect_to_db
+from server import app, db, connect_to_db, session
 from model import User, Score
-
+from unittest.mock import patch
 #############################################################################################################################
 
 class ServerTestsLoggedIn(unittest.TestCase):
-	''' A series of tests that tests all routes when a user is logged in, and a session added '''
+	''' A series of tests that tests all routes that require a user to be logged in '''
 
 	def setUp(self):
 		''' runs before each test '''
@@ -25,6 +25,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		db.create_all()
 		example_data()
 
+		# adds a  user to the session from example_data to carry out routes that require log in
 		user = User.query.filter_by(username='awesomewordguesses').first()
 
 		with self.client as c:
@@ -67,7 +68,6 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		self.assertIn(b"300", result.data)
 		self.assertIn(b"joyful", result.data)
 		self.assertNotIn(b"crystal", result.data)
-
 
 
 	def test_view_leaderboard_route_when_logged_in(self):
@@ -210,13 +210,219 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 
 
 
+class ServerTestsPageRefresh(unittest.TestCase):
+	''' A series of tests to make sure that when page refreshes, letter locations on board are maintained '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+
+
+		# adds a user to the session to carry out routes while logged in
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = user.user_id
+				sess['difficulty_level'] = "3"
+				sess['name'] = user.username
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_route_play(self):
+		''' '''
+
+		# mocking guessed letters
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['r', 'e'])
+
+		# makes sure guessed letters are  in html
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/play")
+			self.assertIn(b"<span id=3>r</span>", result.data)
+			self.assertIn(b"<span id=2>r</span>", result.data)
+			self.assertIn(b"<span id=1>e</span>", result.data)
+			self.assertIn(b"<span id=0>___</span>", result.data)
+			self.assertNotIn(b"<span id=0>b</span>", result.data)
 
 
 
+class ServerTestsDifficultyLevel(unittest.TestCase):
+	''' A series of tests that tests that difficulty_level is changed '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+
+		# adds a user to the session to carry out routes while logged in
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = user.user_id
+				sess['difficulty_level'] = "3"
+				sess['name'] = user.username
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_new_difficulty_level(self):
+		''' makes sure a thatt when the user selects a new difficulty level, the difficulty level updates '''
+
+		# mocking guessed letters
+		self.word_game = Game()
+		self.word_game.word = "berry"
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/play_again", query_string={'difficulty-level': '8'})
+			self.assertIn(b'"difficulty_level": "8"', result.data)
+			self.assertNotIn(b"3", result.data)
+
+
+	def test_no_change_difficulty_level(self):
+		''' makes sure a thatt when the user selects no difficulty level, the difficulty level does not update '''
+
+		result = self.client.get("/play_again", query_string={'difficulty-level': ''})
+		self.assertIn(b'"difficulty_level": "3"', result.data)
+		self.assertNotIn(b'"difficulty_level": "8"', result.data)
 
 
 
+class ServerTestsCheckGameLogic(unittest.TestCase):
+	''' A series of tests that tests that test the game logic through the route check '''
 
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+		# adds a user to the session to carry out routes while logged in
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = user.user_id
+				sess['difficulty_level'] = "3"
+				sess['name'] = user.username
+
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_game_over(self):
+		''' tests that the game is over '''
+
+		# mocking guessed letters
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['r', 'e', 'b', 'y'])
+		self.word_game.word_set = set(list(self.word_game.word))
+
+		# substitutes server word game with mock word game
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/check")
+			self.assertIn(b"The game is over. Please choose to play again", result.data)
+	
+
+	def test_letter_already_guessed(self):
+		''' tests if the letter is already guessed '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['r', 'e', 'b'])
+		self.word_game.incorrect_guessed_letters = set(['y'])
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/check", query_string={'letter': 'Y'})
+			self.assertIn(b"You already guessed the letter y", result.data)
+
+
+	def test_for_win(self):
+		''' tests if the user wins when entering a letter'''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['e', 'b', 'y'])
+		self.word_game.word_set = set(list(self.word_game.word))
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/check", query_string={'letter': 'r'})
+			self.assertIn(b"You win!", result.data)
+
+
+	def test_for_correct_guess(self):
+		''' tests for correct guess where player does not win '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.correct_guessed_letters = set(['e', 'y'])
+		self.word_game.word_set = set(list(self.word_game.word))
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/check", query_string={'letter': 'b'})
+			self.assertIn(b"Great Work! Correct Guess!", result.data)
+
+
+	def test_for_wrong_guess(self):
+		''' tests for a wrong guess where player does not lose '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 2
+		self.word_game.max_incorrect_guesses = 6
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/check", query_string={'letter': 't'})
+			self.assertIn(b"Sorry, Incorrect Guess! t is not in the word.", result.data)
+
+	def test_for_lose(self):
+		''' tests if user loses after entering a letter '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 5
+		self.word_game.max_incorrect_guesses = 6
+
+		with patch('server.word_game',self.word_game):
+			result = self.client.get("/check", query_string={'letter': 't'})
+			self.assertIn(b"Sorry, you have lost the game.", result.data)
 
 
 #############################################################################################################################
