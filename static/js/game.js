@@ -91,7 +91,8 @@ function getNewWord(evt) {
 
 	// prevents default action of form
 	evt.preventDefault()
-
+	let progressBar = document.getElementById("myBar");
+	progressBar.style.width = '0'
 	// hides modal if displayed
 	let modal = document.getElementById('play-modal');
 		$("#word-to-guess").empty();
@@ -154,7 +155,7 @@ function makeNewGame(evt) {
 
 	// resets progress bar
 	let progressBar = document.getElementById("myBar");
-	progressBar.style.width = '0'
+	progressBar.style.width = '0';
 
 	// gets new word from the server, and adds to the DOM
 	$.get('/play_again', function (data) {

@@ -23,29 +23,26 @@ def index():
 def log_in():
 	''' allows a user to login '''
 
-	print(request.form)
 	# Receiving information from form to log user into the game. 
-	#request.form returns an immutable MultiDict(). Used this method to convert.
-
+	# request.form returns an immutable MultiDict(). Used this method to convert
 	request_info = request.form.to_dict()
 	entered_username = request_info['InputUsername']
 	entered_password = request_info['InputPassword']
 	existing_user = User.query.filter(User.username==entered_username).first()
 
-	# checks to make sure user exists before logging in
+	# checks to make sure user exists 
 	if not existing_user:
 		flash("Username does not exist. Please sign up or check your spelling")
 		return redirect("/")
 
-	# if user exists, checks to make .ure entered password matches corresponding password in database
-	# if so, logs user into the game. If they don't match, user is told to try again
-	# A new game object is instantiated when user logs in
+	# if user exists, checks password, to make sure it matches database password
+	# if so, logs user into the game. 
 	else:
 		if existing_user.password == entered_password:
 			session["user_id"] = existing_user.user_id
 			session["name"] = existing_user.username
 
-			#creates a session with a default difficulty level
+			#creates a session with a default difficulty level, and instantiates a new game
 			# in the future, the user will be able to choose a default difficulty level when registering/signing up and change it in his/her profile
 			global word_game
 			session["difficulty_level"] = "3"
@@ -53,6 +50,8 @@ def log_in():
 
 			flash("you have successfully logged in")
 			return redirect("/play")
+
+		# if passwords do not match, user is redirected home
 		else:
 			flash("Password Incorrect. Please try again")
 			return redirect("/")
@@ -66,15 +65,12 @@ def sign_up():
 	new_username = request.form["SignUpInputEmail"].lower()
 	new_password = request.form["SignUpPassword"]
 	confirm_password = request.form["ConfirmInputPassword"]
-	
-	print("new password {} new_username {}".format(new_password, new_username))
 
 	# checks if user is already existing user to prevent duplicate usernames
 	existing_user = User.query.filter_by(username=new_username).first()
 
-	# makes sure passwords are the same, and the selected username has not already been taken
+	# checks if password matches confirmatory password
 	# In the future, I plan to use password encryption, validation, and set passwprd limits to increase security
-	# A new game object is intantiated when user is confirmed and signs in
 	if new_password == confirm_password and not existing_user:
 		new_user = User(username = new_username, password=new_password)
 		db.session.add(new_user)
@@ -86,11 +82,11 @@ def sign_up():
 
 		#creates a session with a default difficulty level
 		# in the future, the user will be able to choose a default difficulty level when registering/signing up and change it in his/her profile
+		# A new game object is intantiated when user is confirmed and signs in
 		global word_game
 		session["difficulty_level"] = "3"
 		word_game = Game(session["difficulty_level"])
 
-		word_game = Game()
 		return redirect("/play")
 
 	# checks to make sure passwords match
@@ -119,7 +115,7 @@ def log_out():
 
 @app.route('/play')
 def play():
-	''' renders the initial page. Session maintains word. If page is refreshed, maintains the original word and game'''
+	''' renders the game page '''
 
 	# if user is not logged in, redirectsback to homepage
 	if "user_id" not in session:
@@ -154,13 +150,10 @@ def play():
 
 	print("word is {} and difficulty_level is {}".format(word, word_game.difficulty_level))
 
-	adjust_bar_width = str(17 * (6-remaining_guesses)) + "%"
-	print(adjust_bar_width)
-
-	# sends over variables to be used for initial Jinja templating
+	# sends over variables to be used for Jinja templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
 		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
-		difficulty_level=session["difficulty_level"], name=session["name"], bar_width=adjust_bar_width)
+		difficulty_level=session["difficulty_level"], name=session["name"])
 
 
 @app.route('/play_again')
@@ -195,6 +188,7 @@ def play_again():
 def check():
 	''' carries out came logic based on instance of Game() class, and responds with appropriate message and information '''
 
+	# an empty dictinary to be converted into JSON 
 	game_response = {}
 
 	#checks to make sure the game has not already ended
@@ -202,7 +196,7 @@ def check():
 		game_response["message"] = "The game is over. Please choose to play again"
 	# if not game over, carries out game logic
 	else:
-		# receives the chosen letter 
+		# receives the letter request from the browser
 		letter = request.args.get('letter') 
 		letter = letter.lower()
 
