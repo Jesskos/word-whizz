@@ -10,25 +10,28 @@ function checkLetter(evt) {
 
 	console.log(letterChoice)
 
-	$.get('/check', letterChoice, (results) => {
+	$.get('/check', letterChoice, getUpdate)};
+
+
+function getUpdate(results) {
 
 		// resets form so user does not have to delete letters
 		document.getElementById("letter-guessing-form").reset();
 
 		// checks if letter was a correct guess, and adds indices of letter to DOM
 		if (results["message"].includes("Correct Guess!")) {
-			addLetter(results["indices"], letterChoice['letter']);
+			addLetter(results["indices"], results['letter']);
 			alert(results["message"]);
 
 		// checks if letter was an incorrect guess, and adds incorrect choices to DOM
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
-			$("#incorrect-letters-guessed-list").append(letterChoice["letter"] + " ");
+			$("#incorrect-letters-guessed-list").append(results["letter"] + " ");
 			growAntiProgessBar(results["remaining_guesses"]);
 			alert(results["message"]);
 		
 		// checks if user lost the game, and show modal to play again
 		} else if (results["message"].includes("lost the game")) {
-			$("#incorrect-letters-guessed-list").append(letterChoice["letter" + " "]);
+			$("#incorrect-letters-guessed-list").append(results["letter" + " "]);
 			$("div#word-to-guess").html(results["word"]);
 			growAntiProgessBar(results["remaining_guesses"]);
 			showModal(results["message"], results["score"]);
@@ -36,7 +39,7 @@ function checkLetter(evt) {
 
 		// checks if user won the game, and show modal to play again	
 		} else if (results["message"].includes("win")) {
-			addLetter(results["indices"], letterChoice['letter']);
+			addLetter(results["indices"], results['letter']);
 			showModal(results["message"], results["score"]); 
 
 		// checks if user already guessed a letter
@@ -50,8 +53,7 @@ function checkLetter(evt) {
 
 		// modified the guesses left
 		$("#num-remaining-guesses").html(results["remaining_guesses"]);
-		});
-}
+		};
 
 
 function addLetter(indices, letter) {

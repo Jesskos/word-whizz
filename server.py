@@ -63,7 +63,7 @@ def sign_up():
 	''' allows a user to signup '''
 
 	# getting information from forms to sign up user to play game
-	new_username = request.form["SignUpInputEmail"]
+	new_username = request.form["SignUpInputEmail"].lower()
 	new_password = request.form["SignUpPassword"]
 	confirm_password = request.form["ConfirmInputPassword"]
 	
@@ -128,6 +128,7 @@ def play():
 	#gets global variable wordgame
 	global word_game
 	word = word_game.get_word()
+	print(word)
 	
 	# gets length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses for templating
 	# when page is refreshed, game will maintain where it left off
@@ -136,12 +137,27 @@ def play():
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 
+	print(length_word)
+
 	# makes a dictioary of the index as key, and the letter as values so that if the page is refreshed, letter location on board is maintained
 	correctly_guessed_dictionary = {}
-	for letter in correctly_guessed_letters:
-		indices = word_game.get_indices_of_letter_in_word(letter)
-		for index in indices:
-			correctly_guessed_dictionary[index] = letter
+
+	if not word_game.lose():
+		for letter in correctly_guessed_letters:
+			indices = word_game.get_indices_of_letter_in_word(letter)
+			for index in indices:
+				correctly_guessed_dictionary[index] = letter
+
+	else:
+		for letter_idx in range(len(word)):
+			correctly_guessed_dictionary[letter_idx] = word[letter_idx]
+
+
+
+	print(correctly_guessed_dictionary)
+
+	print("incorrect_guessed_letters={} correctly_guessed_letters={} length_word={} remaining_guesses={} correctly_guessed_letters={}".
+		format(incorrect_guessed_letters, correctly_guessed_letters, length_word, remaining_guesses, correctly_guessed_dictionary))
 
 	print("word is {} and difficulty_level is {}".format(word, word_game.difficulty_level))
 
@@ -203,6 +219,7 @@ def check():
 			checked_letter = word_game.check_letter(letter)
 			remaining_guesses = word_game.guesses_left()
 			indices_of_letter_in_word = word_game.get_indices_of_letter_in_word(letter)
+			game_response['letter'] = letter
 
 			# if the checked letter is in the word, will include the indices of the checked letter in the word in the response.
 			# will also check if the player has completed the word and won when they make the guess
@@ -242,6 +259,11 @@ def check():
 					game_response["message"] = "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".format(letter, remaining_guesses)
 
 	return jsonify(game_response)
+
+
+@app.route('/check_word')
+def check_word():
+	pass
 
 
 @app.route('/view_leaderboard')
