@@ -5,11 +5,13 @@ from datetime import datetime
 WORD_URL = "http://app.linkedin-reach.io/words"
 
 class Game:
-	''' A class to define the game rules and logic'''
+	''' A class to define and encapsulate the game rules and logic'''
 
+	# a class attribute, which is a dictionary to store words at difficulty levels
 	words = {}
 
 	def __init__(self, difficulty_level="3"):
+		''' initializes a game with instance attributes below '''
 
 		self.word = Game._make_new_word(difficulty_level=difficulty_level)
 		self.difficulty_level = difficulty_level
@@ -21,23 +23,34 @@ class Game:
 		self.total_score = 0
 
 	def get_word(self):
-		''' returns a word to guess'''
+		''' returns the word '''
 
 		return self.word
 
 
 	@staticmethod
 	def _make_new_word(difficulty_level="3"):
-		''' a temporary method to get all the words from API at a certain difficulty level, and pick one at random'''
+		''' a method to get all the words from API at a specified difficulty level, and pick one at random '''
 		
+		# Checks if the difficulty level key is already in the dictionary
 		if difficulty_level not in Game.words:
 			print("Calling API to get words")
 			payload = {"difficulty": difficulty_level}
+
+			# Calls API to get words at a certain difficulty level
 			r = requests.get(WORD_URL, params=payload)
+
+			# Makes a list of words
 			new_words = r.text.split("\n")
+
+			# adds words to class variable dictionary, with difficulty_level as key and list of words as value
 			Game.words[difficulty_level] = new_words
+
+		# If diffiuclty level key is already in dictionary, a second API call can be avoid
 		else:
 			print("Not calling API because words is not empty.")
+
+		# returns a random word from the list corresponding to the difficulty level key
 		return random.choice(Game.words[difficulty_level])
 
 
@@ -48,7 +61,7 @@ class Game:
 
 
 	def check_letter(self,letter):
-		''' checks if the letter is in the word and adjusts the global list variable and incorrect_guesses counter variable based on the response'''
+		''' checks if the letter is in the word, and keeps track of letters guessed correctly, letters guessed incorrectly, and number of incorrect guesses '''
 
 		if letter in self.word and (letter not in self.incorrect_guessed_letters or letter not in self.correct_guessed_letters):
 			self.correct_guessed_letters.add(letter)
@@ -60,7 +73,7 @@ class Game:
 
 
 	def is_already_guessed_letter(self,letter):
-		''' checks whether or not the letter has been previously gussed by the user'''
+		''' checks whether or not the letter has been previously gussed by the user '''
 
 		if letter in self.incorrect_guessed_letters or letter in self.correct_guessed_letters:
 			return True 
@@ -68,7 +81,7 @@ class Game:
 
 
 	def guesses_left(self):
-		''' returns the remaining guesses''' 
+		''' returns the number remaining guesses''' 
 
 		remaining_guesses = self.max_incorrect_guesses - self.incorrect_guesses
 		return remaining_guesses
@@ -83,7 +96,7 @@ class Game:
 
 
 	def get_indices_of_letter_in_word(self, letter):
-		''' gets the indices of the chosen letter in a word ''' 
+		''' gets the index or indices of the a letter in a word ''' 
 
 		indices_of_letter = []
 		for idx, char in enumerate(self.word):
@@ -101,7 +114,7 @@ class Game:
 
 
 	def game_over(self):
-		''' checks to make sure the game is over so that the user does not play again with the same word'''
+		''' checks if the game is over '''
 
 		if self.win() or self.lose():
 			return True
