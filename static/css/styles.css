@@ -1,3 +1,5 @@
+
+
 /*containers*/
 
 .container {
@@ -28,15 +30,6 @@
 	margin-top: 3%;
 }
 
-#word-to-guess-border {
-	display: flex;
-	justify-content: center;
-	font-size: 30px;
-	width: 70%;
-	height: 25%;
-	border: 2px black solid;
-}
-
 .container-login {
 	display: flex;
 	justify-content: center;
@@ -45,16 +38,27 @@
 	margin: 1%;
 }
 
+#scores-container {
+	display: flex;
+	margin-left: 10%;
+	margin-right: 20%;
+}
 
-/*Difficulty level
-*/#Difficulty {
+/*game template styles (Lines 47 -158)*/
+
+#Difficulty {
 	color: blue;
 	font-size: 20px;
 }
 
-
-
-/*word to guess*/
+#word-to-guess-border {
+	display: flex;
+	justify-content: center;
+	font-size: 30px;
+	width: 70%;
+	height: 25%;
+	border: 2px black solid;
+}
 
 #word-length {
 	color: green;
@@ -65,12 +69,6 @@
 	font-size: 30px;
 	text-align: center;
 	margin: auto;
-}
-
-#scores-container {
-	display: flex;
-	margin-left: 10%;
-	margin-right: 20%;
 }
 
 .scores {
@@ -133,9 +131,9 @@ input[type=submit] {
  align-self: center;
 }
 
-
 /*
 modal information */
+
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -159,7 +157,25 @@ modal information */
     width: 60%;
 }
 
-/*signup page*/
+/*anti progress bar
+*/
+
+#myProgress {
+  margin-top: 2%;
+  width: 100%;
+  background-color: #87CEEB;
+}
+
+#myBar {
+  width: 0%;
+  height: 30px;
+  background-color: #ff4d4d;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+}
+
+/*signup and login page*/
 
 #signup {
 	margin-top: 5%;
@@ -183,6 +199,7 @@ modal information */
 
 /*leaderboard and history 
 */
+
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
@@ -201,21 +218,4 @@ tr:nth-child(even) {
 }
 
 
-/*anti progress bar
-*/
-
-#myProgress {
-  margin-top: 2%;
-  width: 100%;
-  background-color: #87CEEB;
-}
-
-#myBar {
-  width: 0%;
-  height: 30px;
-  background-color: #ff4d4d;
-  text-align: center;
-  line-height: 30px;
-  color: white;
-}
 
