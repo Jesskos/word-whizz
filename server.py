@@ -341,5 +341,5 @@ def view_game_history():
 
 if __name__ == "__main__": # pragma: no cover
 	connect_to_db(app)  # pragma: no cover
-	app.run(debug=True) # pragma: no cover
+	app.run() # pragma: no cover
 
