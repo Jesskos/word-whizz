@@ -180,6 +180,7 @@ function makeNewGame(evt) {
   		});
 }
 
+
 function growAntiProgessBar(remainingGuesses) {
 	// grows an "antiprogress" bar with every incorrect guess
 	// growth calculated by 100/6, as 6 is the maximum number of incorrect guesses
