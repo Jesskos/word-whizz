@@ -11,15 +11,20 @@
 <body>
 
 	<!-- Flash Message -->
+
 	  {% for message in get_flashed_messages() %}
     <li>{{ message }}</li>
   		{% endfor %}
+
+  	<!--Game Title -->
 
 	<div class="title"> 
 		<h1>Word Wizz</h1>
 	</div>
 
 	<div class="container-login"> 
+
+	<!-- Login -->
 
 	   <div id="login">
 	   		<h1>Log In</h1>
@@ -36,7 +41,7 @@
 			</form>
 		</div>
 
-
+	<!-- Sign Up -->
 		<div id="signup">
 			<h1>Sign Up</h1>
 			<form action="/signup" method="POST">
