@@ -4,6 +4,8 @@
 
 function checkLetter(evt) {
 	// gets a letter from the form, and sends a request to the server
+
+	// prevents default action of the form
 	evt.preventDefault()
 	const letterChoice = {
 		'letter': $('#letter-input').val()
@@ -21,13 +23,13 @@ function getUpdate(results) {
 			addLetter(results["indices"], results['letter']);
 			alert(results["message"]);
 
-		// checks if letter was an incorrect guess, and adds incorrect choices to DOM
+		// checks if letter was an incorrect guess, and adds incorrect letters and remaining choices to DOM
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
 			$("#incorrect-letters-guessed-list").append(results["letter"] + " ");
 			growAntiProgessBar(results["remaining_guesses"]);
 			alert(results["message"]);
 		
-		// checks if user lost the game, and show modal to play again
+		// checks if user lost the game, shows the entire word, and displays modal with option to play again along with the player's score
 		} else if (results["message"].includes("lost the game")) {
 			$("#incorrect-letters-guessed-list").append(results["letter" + " "]);
 			$("div#word-to-guess").html(results["word"]);
@@ -35,12 +37,12 @@ function getUpdate(results) {
 			showModal(results["message"], results["score"]);
 
 
-		// checks if user won the game, and show modal to play again	
+		// checks if user won the game, adds remaining letters, and show modal to play again	
 		} else if (results["message"].includes("win")) {
 			addLetter(results["indices"], results['letter']);
 			showModal(results["message"], results["score"]); 
 
-		// checks if user already guessed a letter
+		// checks if user already guessed the letter, and alerts user
 		} else if (results["message"].includes("You already guessed")) {
 			alert(results["message"]);
 
@@ -49,7 +51,7 @@ function getUpdate(results) {
 			showModal(results["message"], results["score"]); 
 		};
 
-		// modified the guesses left
+		// for all outcomes, adjusts remmaining guesses
 		$("#num-remaining-guesses").html(results["remaining_guesses"]);
 		};
 
@@ -58,6 +60,10 @@ function addLetter(indices, letter) {
 	// a helper functin to add letters to html by searching for element id
 
 	let i;
+
+	// counts up to the length of the list of indices
+	// since each index corresponds to the <span> id with the same index, the ___ in the <span>
+	// is replaced with the letter at that index
 	for (i=0; i<indices.length; i++){
 		console.log(i)
 		let itemId = indices[i];
@@ -68,7 +74,7 @@ function addLetter(indices, letter) {
 
 
 function showModal(notification, score) {
-	// shows modal if the user wins or loses
+	// shows modal if the user wins or loses with the game score and a message
 
 	$('#notification').html(notification);
 	$('#game-score').html(score);
@@ -86,20 +92,23 @@ function closeModal(evt) {
 }
 
 
-function getNewWord(evt) {
-	// dynamically gets a new word from the server when user chooses to play again
+// functions getNewWord (lines 95-119) and makeNewGame (159-179) can be combined into one function
 
-	// prevents default action of form
+function getNewWord(evt) {
+	// dynamically gets a new word from the server when user chooses to play again (in modal) by clicking the button "New Game"
+
+	// prevents default action of form, and resets "anti-progress bar"
 	evt.preventDefault()
 	let progressBar = document.getElementById("myBar");
 	progressBar.style.width = '0'
+
 	// hides modal if displayed
 	let modal = document.getElementById('play-modal');
 		$("#word-to-guess").empty();
 		$("#incorrect-letters-guessed-list").empty()
 		modal.style.display="none";
 
-	// gets data from server to load new word while on page, and replaces the html element with new word data
+	// makes an AJAX request to the server to receive a new word, and adds the new word to the DOM
 	  $.get('/play_again', function (data) {
   		let letter_index;
  		for (letter_index=0; letter_index<data.word_length; letter_index++) {
@@ -112,52 +121,55 @@ function getNewWord(evt) {
 
 
 function changeDifficulty(evt) {
-	//dynamically changes the difficulty of the word aby sending difficulty level to the server, returning a new word
+	//dynamically changes the difficulty of the word by sending a request to the server for a word at that new difficulty level
 
 	// prevents default action of form
 	evt.preventDefault();
 
-	// resets progress bar
+	// resets ant--progress bar to start new game
 	let progressBar = document.getElementById("myBar");
 	progressBar.style.width = '0'
 
-	// sends difficulty choice to the server
+	// creates a variable to store difficulty level
 	console.log("in changeDifficulty")
 	const difficultyChoice = {
 		'difficulty-level': $("#difficulty-rating").val()
 	};
 	console.log(difficultyChoice);
 
-	// clears out contents of inccorrect letters, word that was previously guessed, and difficulty level
+	// clears out DOM contents of inccorrect letters, current word, and difficulty level in preparation for a new word
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
 	$("#Difficulty").empty()
 
-	// sends a request to get a new word from the browser, and adds to the DOM
+	// makes an AJAX request to the route in server below with the new diffiuclty level, and receives a response with a new word at that difficulty level
 	$.get('/play_again', difficultyChoice, (results) => {
 		console.log(results);
 		let letter_index;
  		for (letter_index=0; letter_index<results["word_length"]; letter_index++) {
  			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
  		};
+
+ 		// adds the new word to teh DOM
  		$("#num-remaining-guesses").html(results["remaining_guesses"]);
  		$("#word-length").html(results["word_length"]);
  		$("#Difficulty").html(results["difficulty_level"])
 	});
 }
 
+
 function makeNewGame(evt) {
 	// dynamically changes the word when user selects 'new game', returning a new word at the same difficulty level
 
-	// clears out old words and letters
+	// clears out old words and letters to prepare for new word
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
 
-	// resets progress bar
+	// resets anti-progress bar to start new game
 	let progressBar = document.getElementById("myBar");
 	progressBar.style.width = '0';
 
-	// gets new word from the server, and adds to the DOM
+	// makes an AJAX request the route in the server below to get a new word, and receives a response with the new word
 	$.get('/play_again', function (data) {
   		let letter_index;
  		for (letter_index=0; letter_index<data.word_length; letter_index++) {
@@ -169,8 +181,8 @@ function makeNewGame(evt) {
 }
 
 function growAntiProgessBar(remainingGuesses) {
-	// grows an "antiprogress" bar when user with every incorrect guess
-	// growth calculated by 100/6, as 6 is the max incorrect guesses
+	// grows an "antiprogress" bar with every incorrect guess
+	// growth calculated by 100/6, as 6 is the maximum number of incorrect guesses
 	
 	let antiProgressBar = document.getElementById("myBar");
 	antiProgressBar.style.width = '0'
@@ -179,6 +191,7 @@ function growAntiProgessBar(remainingGuesses) {
 }
 
 
+// event listeneners
 $("#letter-guessing-form").on("submit", checkLetter);
 $("#no-play-again").on("click", closeModal);
 $("#play-again").on("click", getNewWord);
