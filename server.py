@@ -7,9 +7,7 @@ from datetime import datetime
 # create an instance of the flask application.__name__ tells Flask where to look for files, templates, etc.
 app = Flask(__name__)
 
-# instantiating a new game using the game class
-#word_game = Game()
-
+# creates a dictionary of users playing as the key value and the current word that user is trying to solve as the value
 users_playing = {}
 
 # secret key for encrypting sessions
@@ -48,7 +46,7 @@ def log_in():
 			session["user_id"] = existing_user.user_id
 			session["name"] = existing_user.username
 
-			#creates a session with a default difficulty level of '3', and instantiates a new game
+			# creates a session with a default difficulty level of '3', and instantiates a new game
 			# in the future, I would like the user to be able to choose a difficulty level when registering/signing up and change it in his/her profile
 			# global word_game
 			global users_playing
@@ -92,8 +90,7 @@ def sign_up():
 
 		# Creates a session with a default difficulty level of '3'
 		# In the future, the user will be able to choose a difficulty level when registering/signing up and change it in their profile
-		# A new game object is instantiated when sign up process is completed
-		# global word_game
+		# A new game object is instantiated when sign up process is completed, and added to the dictionary users_playing
 		global users_playing
 		session["difficulty_level"] = "3"
 		users_playing[session["user_id"]] = Game(session["difficulty_level"])
@@ -131,36 +128,25 @@ def log_out():
 def play():
 	''' renders the game page using templating'''
 
-	print ('lets play!')
 	# if user is not logged in, redirectsback to homepage
 	if "user_id" not in session:
 		return redirect("/")
 
-	# gets global variable word_game
-	print ('user is in session')
-	global users_playing
-	try:
-		word_game = users_playing[session["user_id"]]
-	except Exception as e:
-		users_playing[session["user_id"]]= Game(session["difficulty_level"])
-		word_game = users_playing[session["user_id"]]
-
+	# gets global variable users_playing, and finds the user's word based on the session user_id
+	word_game = users_playing[session["user_id"]]
 	word = word_game.get_word()
-	print(word)
 	
 	# Gets the length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses using class methods or attributes
-	# When page is refreshed, game will pick up where it left off
+	# When the page is refreshed, game will pick up where it left off
 	incorrect_guessed_letters = word_game.incorrect_guessed_letters
 	correctly_guessed_letters = word_game.correct_guessed_letters
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 
-	print(length_word)
-
 	# A dictionary to store correctly guessed letters and their indices
 	correctly_guessed_dictionary = {}
 
-	# Makes a dictioary with the index as key, and the letter as values so that if the page is refreshed, letter location on board is maintained
+	# Adds letter index as key, and the letter as value to correctly_guessed_dictionary. If page is refreshed, letter location is maintained. 
 	# If the game is lost, will go into else condition to make a dictionary with all letter indices to reveal entire word to user
 	if not word_game.lose():
 		for letter in correctly_guessed_letters:
@@ -184,7 +170,7 @@ def play():
 def play_again():
 	''' a route that responds to an AJAX call from the browser to refresh the word '''
 
-	# Gets the global variable word_game
+	# Using the global users_playing dictionary, gets the current word
 	global users_playing
 	word_game = users_playing[session["user_id"]]
 	
@@ -192,12 +178,14 @@ def play_again():
 	new_difficulty_level = request.args.get('difficulty-level')
 
 	# If the user changed the difficulty level, instantiates a new game with the new difficutly level as an argument.
+	# finds the user in the dictionary using the key user_id from the session, and replaces it with the new word
 	if new_difficulty_level:
 		session['difficulty_level'] = new_difficulty_level
 		word_game = Game(new_difficulty_level)
 		users_playing[session["user_id"]] = word_game
 
 	# If the user has not changed the difficulty level, instantiates a new game with the current difficulty level from session passed as an argument
+	# finds the user in the dictionary using the key user_id from the session, and replaces it with the new word
 	else:
 		word_game = Game(session["difficulty_level"])
 		users_playing[session["user_id"]] = word_game
@@ -218,13 +206,15 @@ def check():
 	# An empty dictinary to be converted into JSON 
 	game_response = {}
 
+	# gets the current word the user is playing from the users_playing dictionary
 	global users_playing
 	word_game = users_playing[session["user_id"]]
 	print("session id is {} for user {} and the word is {}".format(session["user_id"], session["name"], word_game.get_word()))
 
-		# Checks to make sure the game has not already ended
+	# Checks to make sure the game has not already ended
 	if word_game.game_over():
 		game_response["message"] = "The game is over. Please choose to play again"
+		game_response["score"] = word_game.get_score()
 
 	# If the game has not already ended, carries out game logic
 	else:
