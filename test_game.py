@@ -6,13 +6,13 @@ import requests
 
 
 class GameTestsWhilePlaying(unittest.TestCase):
-	''' unit tests for methods in Game class for a user who makes a guess that neither causes winning or losing'''
+	''' unit tests for methods in Game class for a user who makes a guess that neither causes a win nor loss '''
 
 	TEST_WORD = "chocolate"
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
-		Attributes set up to test when a player who can neither win nor lose the game '''
+		Attributes set up to test the condition of neither winning or losing the game'''
 
 		self.word_game=Game()
 		self.word_game.word=GameTestsWhilePlaying.TEST_WORD
@@ -37,13 +37,13 @@ class GameTestsWhilePlaying(unittest.TestCase):
 
 
 	def test_check_letter_in_word(self):
-		''' tests method check_letter when guessed letter in word '''
+		''' tests method check_letter when the guessed letter is in word '''
 
 		self.assertEqual(self.word_game.check_letter(self.letters[0]), True)
 	
 
 	def test_check_letter_not_in_word(self):
-		'''tests method check_letter when guessed letter not in word'''
+		'''tests method check_letter when the guessed letter is not in word'''
 
 		self.assertEqual(self.word_game.check_letter(self.letters[1]), False)
 		self.assertEqual(self.word_game.incorrect_guesses, 3)
@@ -57,6 +57,7 @@ class GameTestsWhilePlaying(unittest.TestCase):
 
 	def test_is_already_guessed_letter_for_letter_already_guessed(self):
 		''' tests method is_already_guessed_letter for a letter that has been guessed'''
+
 		self.assertEqual(self.word_game.is_already_guessed_letter(self.letters[0]), True)
 
 
@@ -98,7 +99,7 @@ class WinningGameTests(unittest.TestCase):
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
-		Attributes set up to test for a player who can win the game '''
+		Attributes set up to test the condition when a user wins the game'''
 
 		self.word_game=Game()
 		self.word_game.word=WinningGameTests.TEST_WORD
@@ -145,7 +146,7 @@ class LosingGameTests(unittest.TestCase):
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
-		Attributes set up to test for a player who can win the game '''
+		Attributes set up to test the condition when a user loses the game'''
 
 		self.word_game=Game()
 		self.word_game.word=WinningGameTests.TEST_WORD
@@ -189,7 +190,7 @@ class ApiGameTest(unittest.TestCase):
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
-		Attributes set up to test for a player who can win the game '''
+		Attributes set up to mock difficulty level '''
 
 
 		words = {}
@@ -206,7 +207,7 @@ class ApiGameTest(unittest.TestCase):
 
 
 	def test_word_at_difficulty_level(self):
-		''' test that the API is creating a new word at a specified difficulty_level '''
+		''' test that the API is creating a new word at the specified difficulty_level '''
 
 		payload = {"difficulty": self.word_game.difficulty_level}
 		response = requests.get("http://app.linkedin-reach.io/words", params=payload)
