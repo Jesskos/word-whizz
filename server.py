@@ -8,7 +8,9 @@ from datetime import datetime
 app = Flask(__name__)
 
 # instantiating a new game using the game class
-word_game = Game()
+#word_game = Game()
+
+users_playing = {}
 
 # secret key for encrypting sessions
 app.secret_key="w()r|)gvu&&"
@@ -48,9 +50,10 @@ def log_in():
 
 			#creates a session with a default difficulty level of '3', and instantiates a new game
 			# in the future, I would like the user to be able to choose a difficulty level when registering/signing up and change it in his/her profile
-			global word_game
+			# global word_game
+			global users_playing
 			session["difficulty_level"] = "3"
-			word_game = Game(session["difficulty_level"])
+			users_playing[session["user_id"]] = Game(session["difficulty_level"])
 
 			# when user logs in, flashes a message that they have successfully logged in (see html templating)
 			flash("you have successfully logged in")
@@ -90,9 +93,11 @@ def sign_up():
 		# Creates a session with a default difficulty level of '3'
 		# In the future, the user will be able to choose a difficulty level when registering/signing up and change it in their profile
 		# A new game object is instantiated when sign up process is completed
-		global word_game
+		# global word_game
+		global users_playing
 		session["difficulty_level"] = "3"
-		word_game = Game(session["difficulty_level"])
+		users_playing[session["user_id"]] = Game(session["difficulty_level"])
+
 
 		# User is forwarded to play game
 		return redirect("/play")
@@ -114,6 +119,7 @@ def log_out():
 
 	# Removes user_id, name, and difficulty level from the session to log out user, and redirects back to index
 	if "user_id" in session:
+		del users_playing[session["user_id"]]
 		del session["user_id"]
 		del session["name"]
 		del session["difficulty_level"]
@@ -125,12 +131,20 @@ def log_out():
 def play():
 	''' renders the game page using templating'''
 
+	print ('lets play!')
 	# if user is not logged in, redirectsback to homepage
 	if "user_id" not in session:
 		return redirect("/")
 
 	# gets global variable word_game
-	global word_game
+	print ('user is in session')
+	global users_playing
+	try:
+		word_game = users_playing[session["user_id"]]
+	except Exception as e:
+		users_playing[session["user_id"]]= Game(session["difficulty_level"])
+		word_game = users_playing[session["user_id"]]
+
 	word = word_game.get_word()
 	print(word)
 	
@@ -171,8 +185,9 @@ def play_again():
 	''' a route that responds to an AJAX call from the browser to refresh the word '''
 
 	# Gets the global variable word_game
-	global word_game
-
+	global users_playing
+	word_game = users_playing[session["user_id"]]
+	
 	# Checks if user changed the difficulty level. Returns None if the user has not changed the difficutly level.
 	new_difficulty_level = request.args.get('difficulty-level')
 
@@ -180,10 +195,12 @@ def play_again():
 	if new_difficulty_level:
 		session['difficulty_level'] = new_difficulty_level
 		word_game = Game(new_difficulty_level)
+		users_playing[session["user_id"]] = word_game
 
 	# If the user has not changed the difficulty level, instantiates a new game with the current difficulty level from session passed as an argument
 	else:
 		word_game = Game(session["difficulty_level"])
+		users_playing[session["user_id"]] = word_game
 
 	print("{} is the new difficulty_level and word is {} and difficulty is {}".format(new_difficulty_level, word_game.get_word(), session['difficulty_level']))
 
@@ -201,7 +218,11 @@ def check():
 	# An empty dictinary to be converted into JSON 
 	game_response = {}
 
-	# Checks to make sure the game has not already ended
+	global users_playing
+	word_game = users_playing[session["user_id"]]
+	print("session id is {} for user {} and the word is {}".format(session["user_id"], session["name"], word_game.get_word()))
+
+		# Checks to make sure the game has not already ended
 	if word_game.game_over():
 		game_response["message"] = "The game is over. Please choose to play again"
 
@@ -341,5 +362,5 @@ def view_game_history():
 
 if __name__ == "__main__": # pragma: no cover
 	connect_to_db(app)  # pragma: no cover
-	app.run() # pragma: no cover
+	app.run(debug = True) # pragma: no cover
 
