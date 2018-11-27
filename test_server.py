@@ -1,6 +1,7 @@
 import unittest
 from game import *
 from server import app, db, connect_to_db, session
+import flask
 from model import User, Score
 from unittest.mock import patch
 #############################################################################################################################
@@ -25,14 +26,12 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		db.create_all()
 		example_data()
 
-		# adds a  user to the session from example_data to carry out routes that require log in
-		user = User.query.filter_by(username='awesomewordguesses').first()
-
+		# a mock for session
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = user.user_id
+				sess['user_id'] = 1
 				sess['difficulty_level'] = "3"
-				sess['name'] = user.username
+				sess['name'] = 'teddy'
 
 
 	def tearDown(self):
@@ -45,17 +44,29 @@ class ServerTestsLoggedIn(unittest.TestCase):
 	def test_index_route_when_logged_in(self):
 		''' integration test to make sure home page renders correct information when user is logged in '''
 
-		result = self.client.get("/", follow_redirects=True)
-		self.assertIn(b"Play Word Game", result.data)
-		self.assertEqual(result.status_code, 200)
+		
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.users_playing = {1:self.word_game}
+
+		# mocking users_playing
+		with patch('server.users_playing',self.users_playing):
+			result = self.client.get("/", follow_redirects=True)
+			self.assertIn(b"Play Word Game", result.data)
+			self.assertEqual(result.status_code, 200)
 
 
 	def test_game_route_when_logged_in(self):
 		''' Integratin test to make sure play route renders correct infomation when user is logged in '''
 
-		result = self.client.get("/play")
-		self.assertIn(b"Play Word Game", result.data)
-		self.assertEqual(result.status_code, 200)
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing',self.users_playing):
+			result = self.client.get("/play")
+			self.assertIn(b"Play Word Game", result.data)
+			self.assertEqual(result.status_code, 200)
 
 
 	def test_view_history_route_when_logged_in(self):
@@ -72,7 +83,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 	def test_view_leaderboard_route_when_logged_in(self):
 		''' Integratin test to make sure leaderboard route renders correct information when user is logged in, 
-		and users from database are displayed on leaderboard if they have a score '''
+		and users from database (example data) are displayed on leaderboard if they have a score '''
 
 		result = self.client.get("/view_leaderboard")
 		self.assertIn(b"Leaderboard", result.data)
@@ -86,9 +97,17 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 	def test_log_out_when_logged_in(self):
 		''' tests to make sure a logged in user is logged out ''' 
-		result = self.client.get("/logout", follow_redirects=True)
-		self.assertIn(b"Sign Up/Log In Page", result.data)
-		self.assertEqual(result.status_code, 200)
+
+		# added to log out test since user's word game is removed from users playing when 
+		#
+		self.word_game = Game()
+		self.users_playing = {1:self.word_game}
+
+		# makes sure guessed letters are  in html
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/logout", follow_redirects=True)
+			self.assertIn(b"Sign Up/Log In Page", result.data)
+			self.assertEqual(result.status_code, 200)
 
 
 
@@ -205,6 +224,7 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		result = self.client.post("/login", data={'InputUsername': "coolguesser",
 													'InputPassword': '456def'}, 
 													follow_redirects=True)
+
 		self.assertIn(b"Username does not exist.", result.data)
 		self.assertEqual(result.status_code, 200)
 
@@ -227,13 +247,13 @@ class ServerTestsPageRefresh(unittest.TestCase):
 
 
 		# adds a user to the session to carry out routes while logged in
-		user = User.query.filter_by(username='awesomewordguesses').first()
+		# user = User.query.filter_by(username='awesomewordguesses').first()
 
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = user.user_id
+				sess['user_id'] = 1
 				sess['difficulty_level'] = "3"
-				sess['name'] = user.username
+				sess['name'] = 'teddy'
 
 	def tearDown(self):
 		''' runs after each test '''
@@ -249,9 +269,10 @@ class ServerTestsPageRefresh(unittest.TestCase):
 		self.word_game = Game()
 		self.word_game.word = "berry"
 		self.word_game.correct_guessed_letters = set(['r', 'e'])
+		self.users_playing = {1:self.word_game}
 
 		# makes sure guessed letters are  in html
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing', self.users_playing):
 			result = self.client.get("/play")
 			self.assertIn(b"<span id=3>r</span>", result.data)
 			self.assertIn(b"<span id=2>r</span>", result.data)
@@ -269,8 +290,9 @@ class ServerTestsPageRefresh(unittest.TestCase):
 		self.word_game.correct_guessed_letters = set(['b', 'e'])
 		self.word_game.max_incorrect_guesses = 6
 		self.word_game.incorrect_guesses = 6
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/play")
 			self.assertEqual(self.word_game.guesses_left(), 0)
 			outcome = self.word_game.lose()
@@ -295,16 +317,13 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 		connect_to_db(app, "postgresql:///testdb")
 		db.create_all()
 		example_data()
-		
 
-		# adds a user to the session to carry out routes while logged in
-		user = User.query.filter_by(username='awesomewordguesses').first()
-
+		#'mocking' session id
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = user.user_id
+				sess['user_id'] = 1
 				sess['difficulty_level'] = "3"
-				sess['name'] = user.username
+				sess['name'] = 'teddy'
 
 	def tearDown(self):
 		''' runs after each test '''
@@ -319,19 +338,24 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 		# mocking guessed letters
 		self.word_game = Game()
 		self.word_game.word = "berry"
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/play_again", query_string={'difficulty-level': '8'})
 			self.assertIn(b'"difficulty_level": "8"', result.data)
 			self.assertNotIn(b"3", result.data)
 
 
 	def test_no_change_difficulty_level(self):
-		''' makes sure a thatt when the user selects no difficulty level, the difficulty level does not update '''
+		''' makes sure a that when the user selects no difficulty level, the difficulty level does not update '''
 
-		result = self.client.get("/play_again", query_string={'difficulty-level': ''})
-		self.assertIn(b'"difficulty_level": "3"', result.data)
-		self.assertNotIn(b'"difficulty_level": "8"', result.data)
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.users_playing = {1:self.word_game}
+		with patch('server.users_playing',self.users_playing):
+			result = self.client.get("/play_again", query_string={'difficulty-level': ''})
+			self.assertIn(b'"difficulty_level": "3"', result.data)
+			self.assertNotIn(b'"difficulty_level": "8"', result.data)
 
 
 
@@ -375,9 +399,10 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.word_game.word = "berry"
 		self.word_game.correct_guessed_letters = set(['r', 'e', 'b', 'y'])
 		self.word_game.word_set = set(list(self.word_game.word))
+		self.users_playing = {1:self.word_game}
 
 		# substitutes server word game with mock word game
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/check")
 			self.assertIn(b"The game is over. Please choose to play again", result.data)
 	
@@ -389,8 +414,9 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.word_game.word = "berry"
 		self.word_game.correct_guessed_letters = set(['r', 'e', 'b'])
 		self.word_game.incorrect_guessed_letters = set(['y'])
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/check", query_string={'letter': 'Y'})
 			self.assertIn(b"You already guessed the letter y", result.data)
 
@@ -402,8 +428,9 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.word_game.word = "berry"
 		self.word_game.correct_guessed_letters = set(['e', 'b', 'y'])
 		self.word_game.word_set = set(list(self.word_game.word))
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/check", query_string={'letter': 'r'})
 			self.assertIn(b"You win!", result.data)
 
@@ -415,8 +442,9 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.word_game.word = "berry"
 		self.word_game.correct_guessed_letters = set(['e', 'y'])
 		self.word_game.word_set = set(list(self.word_game.word))
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/check", query_string={'letter': 'b'})
 			self.assertIn(b"Great Work! Correct Guess!", result.data)
 
@@ -428,8 +456,9 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.word_game.word = "berry"
 		self.word_game.incorrect_guesses = 2
 		self.word_game.max_incorrect_guesses = 6
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/check", query_string={'letter': 't'})
 			self.assertIn(b"Sorry, Incorrect Guess! t is not in the word.", result.data)
 
@@ -440,8 +469,9 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.word_game.word = "berry"
 		self.word_game.incorrect_guesses = 5
 		self.word_game.max_incorrect_guesses = 6
+		self.users_playing = {1:self.word_game}
 
-		with patch('server.word_game',self.word_game):
+		with patch('server.users_playing',self.users_playing):
 			result = self.client.get("/check", query_string={'letter': 't'})
 			self.assertIn(b"Sorry, you have lost the game.", result.data)
 

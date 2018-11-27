@@ -126,7 +126,7 @@ def log_out():
 
 @app.route('/play')
 def play():
-	''' renders the game page using templating'''
+	''' renders the game page using templating without changing the word '''
 
 	# if user is not logged in, redirectsback to homepage
 	if "user_id" not in session:
