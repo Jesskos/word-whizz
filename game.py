@@ -21,6 +21,7 @@ class Game:
 		self.incorrect_guesses = 0 
 		self.max_incorrect_guesses = 6
 		self.total_score = 0
+		self.incorrect_words_guessed = set()
 
 	def get_word(self):
 		''' returns the word '''
@@ -113,6 +114,15 @@ class Game:
 		return False
 
 
+	def check_word(self, word):
+		if word == self.word:
+			self.correct_guessed_letters  = set(list(word))
+			return True
+		else:
+			self.incorrect_words_guessed.add(word)
+			self.incorrect_guesses += 1
+
+
 	def game_over(self):
 		''' checks if the game is over '''
 
@@ -128,7 +138,7 @@ class Game:
 
 		base_score = 10
 		point_gains = len(self.correct_guessed_letters) * 10
-		point_losses = self.incorrect_guesses * 1
+		point_losses = self.incorrect_guesses * 1 + len(self.incorrect_words_guessed)
 		total_points = (base_score + point_gains - point_losses) * int(self.difficulty_level)
 
 		if self.game_over():

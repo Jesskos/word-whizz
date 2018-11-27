@@ -10,14 +10,15 @@ function checkLetter(evt) {
 	const letterChoice = {
 		'letter': $('#letter-input').val()
 	};
-	$.get('/check', letterChoice, getUpdate)};
+	$.get('/check', letterChoice, getUpdateAfterCheckLetter)
+};
 
 
-function getUpdate(results) {
+function getUpdateAfterCheckLetter(results) {
 
 		// resets form so user does not have to delete letters
 		document.getElementById("letter-guessing-form").reset();
-
+		
 		// checks if letter was a correct guess, and adds indices of letter to DOM
 		if (results["message"].includes("Correct Guess!")) {
 			addLetter(results["indices"], results['letter']);
@@ -26,16 +27,13 @@ function getUpdate(results) {
 		// checks if letter was an incorrect guess, and adds incorrect letters and remaining choices to DOM
 		} else if (results["message"].includes("Sorry, Incorrect Guess!")) {
 			$("#incorrect-letters-guessed-list").append(results["letter"] + " ");
-			growAntiProgessBar(results["remaining_guesses"]);
 			alert(results["message"]);
 		
 		// checks if user lost the game, shows the entire word, and displays modal with option to play again along with the player's score
 		} else if (results["message"].includes("lost the game")) {
 			$("#incorrect-letters-guessed-list").append(results["letter" + " "]);
 			$("div#word-to-guess").html(results["word"]);
-			growAntiProgessBar(results["remaining_guesses"]);
 			showModal(results["message"], results["score"]);
-
 
 		// checks if user won the game, adds remaining letters, and show modal to play again	
 		} else if (results["message"].includes("win")) {
@@ -51,9 +49,55 @@ function getUpdate(results) {
 			showModal(results["message"], results["score"]); 
 		};
 
-		// for all outcomes, adjusts remmaining guesses
+		// for all outcomes, adjusts remmaining guesses and antiprogress bar
+		growAntiProgessBar(results["remaining_guesses"]);
 		$("#num-remaining-guesses").html(results["remaining_guesses"]);
+};
+
+
+function checkWord(evt) {
+	// gets users word choice, makes a request to the server, and receives a response from the server
+	evt.preventDefault();
+	// gets users wordchoice from form
+	const wordChoice = {
+		'word': $("#word-input").val()
+	};
+	console.log(wordChoice);
+
+	// makes a request and receives the response
+	$.get('/check_word', wordChoice, getUpdateAfterCheckWord)
+};
+
+
+function getUpdateAfterCheckWord(results) {
+
+	//empties word form
+	document.getElementById("word-guessing-form").reset();
+
+	//if the user wins, shows entire word and displays modal
+	if (results["message"].includes("Win")) {
+		$("#word-to-guess").html(results["word"]);
+		showModal(results["message"], results["score"]); 
+
+	// if the user does not guess the word correctly, also lets them know without showing entire word
+	} else if (results["message"].includes("guess was incorrect")) {
+		alert(results["message"]);
+
+	// if the user loses the game, lets them know and shows entire word
+	} else if (results["message"].includes("lost the game")) {
+		$("#word-to-guess").html(results['word']);
+		showModal(results["message"], results["score"]);
+
+	// lets the user know if the game has already ended
+	} else if (results["message"].includes("The game is over")) {
+		showModal(results["message"], results["score"]);
 		};
+
+	// for every response, the 'antiprogres bar' grows in proportion to the guesses remaining
+	growAntiProgessBar(results["remaining_guesses"]);
+	$("#num-remaining-guesses").html(results["remaining_guesses"]);
+
+};
 
 
 function addLetter(indices, letter) {
@@ -188,17 +232,21 @@ function growAntiProgessBar(remainingGuesses) {
 	let antiProgressBar = document.getElementById("myBar");
 	antiProgressBar.style.width = '0'
 	let newWidth = 100 - (remainingGuesses * 17);
+	console.log(newWidth)
 	antiProgressBar.style.width = `${newWidth}%`;
 }
 
 
+// loads JQuery after page loads
 $(document).ready(function() {
+
 // event listeneners
 $("#letter-guessing-form").on("submit", checkLetter);
 $("#no-play-again").on("click", closeModal);
 $("#play-again").on("click", getNewWord);
 $("#change-difficulty").on("submit", changeDifficulty);
 $("#reset-game-button").on("click", makeNewGame);
+$("#word-guessing-form").on("submit", checkWord)
 });
 
 

@@ -133,8 +133,8 @@ def play():
 		return redirect("/")
 
 	# gets global variable users_playing, and finds the user's word based on the session user_id
-
 	word_game = users_playing[session["user_id"]]
+
 	word = word_game.get_word()
 	
 	# Gets the length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses using class methods or attributes
@@ -174,6 +174,9 @@ def play_again():
 	# Using the global users_playing dictionary, gets the current word
 	global users_playing
 	word_game = users_playing[session["user_id"]]
+	
+	word_game = Game()
+	users_playing[session["user_id"]] = word_game
 	
 	# Checks if user changed the difficulty level. Returns None if the user has not changed the difficutly level.
 	new_difficulty_level = request.args.get('difficulty-level')
@@ -227,13 +230,17 @@ def check():
 		# Checks if the letter in the word has already been guessed.
 		if word_game.is_already_guessed_letter(letter):
 			game_response["message"] = "You already guessed the letter {}".format(letter)
+			game_response["remaining_guesses"] = word_game.guesses_left()
 
 		# If the letter has not been gussed yet, checks whether or not the letter is in the word
 		else:
 			checked_letter = word_game.check_letter(letter)
 			remaining_guesses = word_game.guesses_left()
 			indices_of_letter_in_word = word_game.get_indices_of_letter_in_word(letter)
+
+			# sends the letter and the remaining guesses during all of the below scenarios
 			game_response['letter'] = letter
+			game_response["remaining_guesses"]=remaining_guesses
 
 			# Enters this condition if the checked_letter is in the word
 			if checked_letter:
@@ -260,8 +267,6 @@ def check():
 
 			# Enter this condition since the checked_letter was not in the word
 			else:
-				# The number of remaining guesses is included in the response when the letter is guessed incorrectly
-				game_response["remaining_guesses"]=remaining_guesses
 
 				# Enter this condition if player runs out of remaining guesses, and loses
 				if word_game.lose():
@@ -282,6 +287,63 @@ def check():
 					game_response["message"] = "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".format(letter, remaining_guesses)
 
 	# Sends a response to the browser
+	return jsonify(game_response)
+
+
+@app.route('/check_word')
+def check_word():
+	''' checks if user guessed the word '''
+
+	# gets the word that the user is currently playing based on the session_id
+	global users_playing
+	
+	word_game = users_playing[session["user_id"]]
+
+	# an empty dictionary to be sent to the server as a JSON object
+	game_response = {}
+
+	# Checks to make sure the game has not already ended before carrying out logic
+	if word_game.game_over():
+		game_response["message"] = "The game is over. Please choose to play again"
+		game_response["score"] = word_game.get_score()
+		return jsonify(game_response)
+
+	# receives the guessed word from a request
+	word = request.args.get('word')
+	word = word.lower()
+	print(word)
+
+	# checks if the user guessed the correct word. If so, sends a message and the full word
+	checked_word = word_game.check_word(word)
+	print(checked_word)
+
+	if checked_word:
+		game_response["message"] = "You Win! You guessed the word correctly"
+		game_response["word"] = word
+
+	else:
+		# gets remainig guesses
+		remaining_guesses = word_game.guesses_left()
+		game_response["remaining_guesses"]=remaining_guesses
+
+		# checks if user lost the game
+		if word_game.lose():
+			game_response["message"] = "{} is not the word. Sorry, you have lost the game".format(word)
+			game_response["word"] = word
+		
+		# if the user has not lost the game, lets them know they guessed incorrectly
+		else:
+			game_response["message"] = "Sorry, your guess was incorrect. {} is not the word".format(word)
+			game_response["word"] = word
+
+	# saves word game 
+	print(word_game.win())
+	if word_game.win() or word_game.lose():
+		save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win())					
+		db.session.add(save_game)
+		db.session.commit()
+		game_response["score"] = word_game.get_score()
+
 	return jsonify(game_response)
 
 
