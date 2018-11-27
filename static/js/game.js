@@ -120,6 +120,29 @@ function getNewWord(evt) {
 }
 
 
+function makeNewGame(evt) {
+	// dynamically changes the word when user selects 'new game', returning a new word at the same difficulty level
+
+	// clears out old words and letters to prepare for new word
+	$("#word-to-guess").empty();
+	$("#incorrect-letters-guessed-list").empty()
+
+	// resets anti-progress bar to start new game
+	let progressBar = document.getElementById("myBar");
+	progressBar.style.width = '0';
+
+	// makes an AJAX request the route in the server below to get a new word, and receives a response with the new word
+	$.get('/play_again', function (data) {
+  		let letter_index;
+ 		for (letter_index=0; letter_index<data.word_length; letter_index++) {
+ 			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
+ 		};
+ 		$("#num-remaining-guesses").html(data.remaining_guesses)
+ 		$("#word-length").html(data.word_length)
+  		});
+}
+
+
 function changeDifficulty(evt) {
 	//dynamically changes the difficulty of the word by sending a request to the server for a word at that new difficulty level
 
@@ -155,29 +178,6 @@ function changeDifficulty(evt) {
  		$("#word-length").html(results["word_length"]);
  		$("#Difficulty").html(results["difficulty_level"])
 	});
-}
-
-
-function makeNewGame(evt) {
-	// dynamically changes the word when user selects 'new game', returning a new word at the same difficulty level
-
-	// clears out old words and letters to prepare for new word
-	$("#word-to-guess").empty();
-	$("#incorrect-letters-guessed-list").empty()
-
-	// resets anti-progress bar to start new game
-	let progressBar = document.getElementById("myBar");
-	progressBar.style.width = '0';
-
-	// makes an AJAX request the route in the server below to get a new word, and receives a response with the new word
-	$.get('/play_again', function (data) {
-  		let letter_index;
- 		for (letter_index=0; letter_index<data.word_length; letter_index++) {
- 			$("#word-to-guess").append(`<span id=${letter_index}>___ </span>`)
- 		};
- 		$("#num-remaining-guesses").html(data.remaining_guesses)
- 		$("#word-length").html(data.word_length)
-  		});
 }
 
 
