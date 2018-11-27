@@ -133,6 +133,7 @@ def play():
 		return redirect("/")
 
 	# gets global variable users_playing, and finds the user's word based on the session user_id
+
 	word_game = users_playing[session["user_id"]]
 	word = word_game.get_word()
 	
