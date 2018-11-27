@@ -116,7 +116,7 @@ class Game:
 
 	def check_word(self, word):
 		if word == self.word:
-			self.correct_guessed_letters  = set(list(word))
+			self.correct_guessed_letters = set(list(word))
 			return True
 		else:
 			self.incorrect_words_guessed.add(word)

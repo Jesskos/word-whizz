@@ -32,7 +32,7 @@ function getUpdateAfterCheckLetter(results) {
 		// checks if user lost the game, shows the entire word, and displays modal with option to play again along with the player's score
 		} else if (results["message"].includes("lost the game")) {
 			$("#incorrect-letters-guessed-list").append(results["letter" + " "]);
-			$("div#word-to-guess").html(results["word"]);
+			$("div#word-to-guess").html(results["secret_word"]);
 			showModal(results["message"], results["score"]);
 
 		// checks if user won the game, adds remaining letters, and show modal to play again	
@@ -47,6 +47,9 @@ function getUpdateAfterCheckLetter(results) {
 		// checks if a user's game is already over
 		} else if (results["message"].includes("The game is over")) {
 			showModal(results["message"], results["score"]); 
+
+		} else {
+			alert(results["message"])
 		};
 
 		// for all outcomes, adjusts remmaining guesses and antiprogress bar
@@ -76,7 +79,7 @@ function getUpdateAfterCheckWord(results) {
 
 	//if the user wins, shows entire word and displays modal
 	if (results["message"].includes("Win")) {
-		$("#word-to-guess").html(results["word"]);
+		$("#word-to-guess").html(results["secret_word"]);
 		showModal(results["message"], results["score"]); 
 
 	// if the user does not guess the word correctly, also lets them know without showing entire word
@@ -85,13 +88,17 @@ function getUpdateAfterCheckWord(results) {
 
 	// if the user loses the game, lets them know and shows entire word
 	} else if (results["message"].includes("lost the game")) {
-		$("#word-to-guess").html(results['word']);
+		$("#word-to-guess").html(results['secret_word']);
 		showModal(results["message"], results["score"]);
 
 	// lets the user know if the game has already ended
 	} else if (results["message"].includes("The game is over")) {
 		showModal(results["message"], results["score"]);
-		};
+
+	// all other messages incided below
+	} else {
+		alert(results["message"])
+	};
 
 	// for every response, the 'antiprogres bar' grows in proportion to the guesses remaining
 	growAntiProgessBar(results["remaining_guesses"]);

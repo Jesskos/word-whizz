@@ -116,7 +116,7 @@ def log_out():
 
 	# Removes user_id, name, and difficulty level from the session to log out user, and redirects back to index
 	if "user_id" in session:
-		del users_playing[session["user_id"]]
+		# del users_playing[session["user_id"]]
 		del session["user_id"]
 		del session["name"]
 		del session["difficulty_level"]
@@ -133,6 +133,7 @@ def play():
 		return redirect("/")
 
 	# gets global variable users_playing, and finds the user's word based on the session user_id
+
 	word_game = users_playing[session["user_id"]]
 
 	word = word_game.get_word()
@@ -222,10 +223,15 @@ def check():
 
 	# If the game has not already ended, carries out game logic
 	else:
+
 		# Receives the request with the letter from the browser
-		# I plan to improve form validation in the future (making sure letter is one charater, only contains alpha characters, etc)
 		letter = request.args.get('letter') 
 		letter = letter.lower()
+
+		# extra backend validation to make sure the letter is actually a letter, and is one character in length
+		if len(letter) != 1 or not letter.isalpha():
+			game_response["message"] = "invalid input"
+			return jsonify("game_response")
 
 		# Checks if the letter in the word has already been guessed.
 		if word_game.is_already_guessed_letter(letter):
@@ -273,7 +279,7 @@ def check():
 
 					# Adds a message, score, and entire word to response when player loses
 					game_response["message"] = "Sorry, you have lost the game."
-					game_response["word"] = word_game.get_word()
+					game_response["secret_word"] = word_game.get_word()
 					game_response["score"] = word_game.get_score()
 
 					# saves the game to the database
@@ -296,11 +302,14 @@ def check_word():
 
 	# gets the word that the user is currently playing based on the session_id
 	global users_playing
-	
 	word_game = users_playing[session["user_id"]]
 
 	# an empty dictionary to be sent to the server as a JSON object
 	game_response = {}
+
+	# receives the guessed word from a request, and makes it lowecase
+	guessed_word = request.args.get('word')
+	guessed_word = guessed_word.lower()
 
 	# Checks to make sure the game has not already ended before carrying out logic
 	if word_game.game_over():
@@ -308,36 +317,41 @@ def check_word():
 		game_response["score"] = word_game.get_score()
 		return jsonify(game_response)
 
-	# receives the guessed word from a request
-	word = request.args.get('word')
-	word = word.lower()
-	print(word)
+		# checks to make sure entered word is the same length as secret word
+	elif word_game.get_word_length() != len(guessed_word):
+		game_response["message"] = "Invalid entry! make sure your guess is the same length as the secret word"
+		return jsonify(game_response)
+
+	# extra step to verify that input is all letters (also done in html)
+	elif not guessed_word.isalpha():
+		game_response["message"] == "invalid input"
+		return jsonify(game_response)
+
+	# A method in Game class to compare the word to the secret word
+	checked_word = word_game.check_word(guessed_word)
+
+	# gets remainig guesses, which is to be sent in response to all conditions below
+	remaining_guesses = word_game.guesses_left()
+	game_response["remaining_guesses"]=remaining_guesses
 
 	# checks if the user guessed the correct word. If so, sends a message and the full word
-	checked_word = word_game.check_word(word)
-	print(checked_word)
-
 	if checked_word:
 		game_response["message"] = "You Win! You guessed the word correctly"
-		game_response["word"] = word
+		game_response["secret_word"] = word_game.get_word()
 
 	else:
-		# gets remainig guesses
-		remaining_guesses = word_game.guesses_left()
-		game_response["remaining_guesses"]=remaining_guesses
-
+		game_response["guessed_word"] = guessed_word
 		# checks if user lost the game
 		if word_game.lose():
-			game_response["message"] = "{} is not the word. Sorry, you have lost the game".format(word)
-			game_response["word"] = word
+			game_response["message"] = "{} is not the word. Sorry, you have lost the game".format(guessed_word)
+			game_response["secret_word"] = word_game.get_word()
 		
 		# if the user has not lost the game, lets them know they guessed incorrectly
 		else:
-			game_response["message"] = "Sorry, your guess was incorrect. {} is not the word".format(word)
-			game_response["word"] = word
+			game_response["message"] = "Sorry, your guess was incorrect. {} is not the word".format(guessed_word)
+			
 
 	# saves word game 
-	print(word_game.win())
 	if word_game.win() or word_game.lose():
 		save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win())					
 		db.session.add(save_game)
