@@ -192,12 +192,14 @@ function growAntiProgessBar(remainingGuesses) {
 }
 
 
+$(document).ready(function() {
 // event listeneners
 $("#letter-guessing-form").on("submit", checkLetter);
 $("#no-play-again").on("click", closeModal);
 $("#play-again").on("click", getNewWord);
 $("#change-difficulty").on("submit", changeDifficulty);
 $("#reset-game-button").on("click", makeNewGame);
+});
 
 
 
