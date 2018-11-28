@@ -133,12 +133,12 @@ def play():
 		return redirect("/")
 
 	# gets global variable users_playing, and finds the user's word based on the session user_id
-	word_game = users_playing[session["user_id"]]
-	# try:
-	# 	word_game = users_playing[session["user_id"]]
-	# except:
-	# 	word_game = Game()
-	# 	users_playing[session["user_id"]] = word_game
+	# word_game = users_playing[session["user_id"]]
+	try:
+		word_game = users_playing[session["user_id"]]
+	except:
+		word_game = Game()
+		users_playing[session["user_id"]] = word_game
 
 	secret_word = word_game.get_word()
 	
