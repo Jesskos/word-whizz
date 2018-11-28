@@ -59,11 +59,10 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 Coming soon!
 
 * The computer shows the score dynamically while user is playing the game.
-* The player can guess the entire word at once.
 * The computer gives a hint to the player by providing the word's dictionary definition.
 * At the end of every game, the computer will display the word's definition to the player.
+* The player can create a profile, and adjust the default difficulty level in the profile. 
 * The player can adjust minimum and maximum length of the word.
-* The player can adjust the difficulty level in the profile. 
 * The player will not be able to receive the same word more than once. 
 
 ### About the Developer
