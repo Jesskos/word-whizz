@@ -115,13 +115,14 @@ def log_out():
 	''' logs a user out of the game, and ends session'''
 
 	# Removes user_id, name, and difficulty level from the session to log out user, and redirects back to index
-	if "user_id" in session:
 		# del users_playing[session["user_id"]]
-		del session["user_id"]
-		del session["name"]
-		del session["difficulty_level"]
-		flash("You have now logged out")
-		return redirect("/")
+	if session['user_id'] in users_playing:
+		del users_playing[session["user_id"]]
+	del session["user_id"]
+	del session["name"]
+	del session["difficulty_level"]
+	flash("You have now logged out")
+	return redirect("/")
 
 
 @app.route('/play')
