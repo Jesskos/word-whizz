@@ -333,12 +333,11 @@ def check_word():
 		return jsonify(game_response)
 
 	# A method in Game class to compare the word to the secret word
-	guess_correct = word_game.check_word(guessed_word
+	guess_correct = word_game.check_word(guessed_word)
 
+	# Gets remainig guesses, which is to be sent in response to all conditions below
+	game_response["remaining_guesses"] = word_game.guesses_left()
 
-	# gets remainig guesses, which is to be sent in response to all conditions below
-	game_response["remaining_guesses"]= word_game.guesses_left()
-	
 	# checks if the user guessed the correct word. If so, sends a message and the full word
 	if guess_correct:
 		game_response["message"] = "You Win! You guessed the word correctly"
