@@ -42,7 +42,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_index_route_when_logged_in(self):
-		''' integration test to make sure home page renders correct information when user is logged in '''
+		''' integration test to test home page renders correct information when user is logged in '''
 
 		
 		self.word_game = Game()
@@ -57,7 +57,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_game_route_when_logged_in(self):
-		''' Integratin test to make sure play route renders correct infomation when user is logged in '''
+		''' Integratin test to test play route renders correct infomation when user is logged in '''
 
 		self.word_game = Game()
 		self.word_game.word = "berry"
@@ -70,7 +70,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_view_history_route_when_logged_in(self):
-		''' Integratin test to make sure history route renders correct information when user is logged in, 
+		''' Integratin test to test that history route renders correct information when user is logged in, 
 		and users scores and words are displayed on history '''
 
 		result = self.client.get("/view_history")
@@ -82,7 +82,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_view_leaderboard_route_when_logged_in(self):
-		''' Integratin test to make sure leaderboard route renders correct information when user is logged in, 
+		''' Integratin test to test leaderboard route renders correct information when user is logged in, 
 		and users from database (example data) are displayed on leaderboard if they have a score '''
 
 		result = self.client.get("/view_leaderboard")
@@ -96,7 +96,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 
 	def test_log_out_when_logged_in(self):
-		''' tests to make sure a logged in user is logged out ''' 
+		''' tests log out functionality ''' 
 
 		# added to log out test since user's word game is removed from users playing when 
 		#
@@ -230,8 +230,8 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 
 
 
-class ServerTestsPageRefresh(unittest.TestCase):
-	''' A series of tests to make sure that when page refreshes, letter locations on board are maintained '''
+class ServerTestsPlay(unittest.TestCase):
+	''' A series of tests to make sure that when page renders, letter locations on board are maintained '''
 
 	def setUp(self):
 		''' runs before each test '''
@@ -391,8 +391,21 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		db.drop_all()
 
 
+	def test_invalid_letter_input(self):
+		''' tests that when a letter input is invalid, the server reponds correctly'''
+		
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.users_playing = {1:self.word_game}
+
+
+		with patch('server.users_playing',self.users_playing):
+			result = self.client.get("/check", query_string={'letter': 'a1'})
+			self.assertIn(b"invalid input", result.data)
+
+
 	def test_game_over(self):
-		''' tests that the game is over '''
+		''' tests that the game is over when conditions for game over met'''
 
 		# mocking guessed letters
 		self.word_game = Game()
@@ -408,7 +421,7 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 	
 
 	def test_letter_already_guessed(self):
-		''' tests if the letter is already guessed '''
+		''' tests for correct response with a letter already guessed'''
 
 		self.word_game = Game()
 		self.word_game.word = "berry"
@@ -422,7 +435,7 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 
 
 	def test_for_win(self):
-		''' tests if the user wins when entering a letter'''
+		''' tests the user wins when entering a letter'''
 
 		self.word_game = Game()
 		self.word_game.word = "berry"
@@ -475,7 +488,123 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 			result = self.client.get("/check", query_string={'letter': 't'})
 			self.assertIn(b"Sorry, you have lost the game.", result.data)
 
+class testCheckWord(unittest.TestCase):
+	''' tests functionality of check_word '''
 
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+		# adds a user to the session to carry out routes while logged in
+		user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = user.user_id
+				sess['difficulty_level'] = "3"
+				sess['name'] = user.username
+
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_for_game_over(self):
+		''' tests for game over '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 6
+		self.word_game.max_incorrect_guesses = 6
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/check_word", query_string={'word': 'apple'})
+			self.assertIn(b'The game is over.', result.data)
+
+
+	def test_for_word_length(self):
+		''' tests that server does not accept word guess that is not equal to secret word '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 6
+		self.word_game.max_incorrect_guesses = 4
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/check_word", query_string={'word': 'cherry'})
+			self.assertIn(b"Invalid entry! make sure your guess is the same length as the secret word", result.data)
+
+
+	def test_for_only_alpha_input(self):
+		'''tests that server only accepts letters '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 6
+		self.word_game.max_incorrect_guesses = 4
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/check_word", query_string={'word': "b3rry"})
+			self.assertIn(b"invalid input", result.data)
+
+
+	def test_winning_game(self):
+		''' tests for correct response when user wins by guessing right word '''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 6
+		self.word_game.max_incorrect_guesses = 5
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/check_word", query_string={'word': 'berry'})
+			self.assertIn(b"You Win! You guessed the word correctly", result.data)
+			self.assertIn(b"berry", result.data)
+
+	def test_losing_game(self):
+		''' tests for correct response when user loses by guessing wrong word'''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 5
+		self.word_game.max_incorrect_guesses = 6
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/check_word", query_string={'word': 'ferry'})
+			self.assertIn(b"you have lost the game", result.data)
+			self.assertIn(b"berry", result.data)
+
+
+	def test_wrong_word(self):
+		''' tests user guessed wrong word but has not lost'''
+
+		self.word_game = Game()
+		self.word_game.word = "berry"
+		self.word_game.incorrect_guesses = 4
+		self.word_game.max_incorrect_guesses = 6
+		self.users_playing = {1:self.word_game}
+
+		with patch('server.users_playing', self.users_playing):
+			result = self.client.get("/check_word", query_string={'word': 'ferry'})
+			self.assertIn(b"Sorry, your guess was incorrect", result.data)
+
+
+##################################################################################
 #############################################################################################################################
 
 def example_data():

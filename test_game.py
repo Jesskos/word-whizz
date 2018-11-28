@@ -22,6 +22,7 @@ class GameTestsWhilePlaying(unittest.TestCase):
 		self.word_game.incorrect_guesses = 2 
 		self.word_game.max_incorrect_guesses = 6
 		self.letters = ['c', 'f', 'g']
+		self.word_game.incorrect_words_guessed = set(["berry"])
 
 
 	def test_get_word(self):
@@ -47,6 +48,11 @@ class GameTestsWhilePlaying(unittest.TestCase):
 
 		self.assertEqual(self.word_game.check_letter(self.letters[1]), False)
 		self.assertEqual(self.word_game.incorrect_guesses, 3)
+
+	def test_get_incorrectly_guessed_words(self):
+		''' tests that incorrectly guessed words are stored'''
+
+		self.assertEqual(self.word_game.get_incorrectly_guessed_words(), set(["berry"]))
 
 
 	def test_is_already_guessed_letter_for_letter_not_guessed(self):

@@ -163,7 +163,7 @@ def play():
 
 	else:
 		for letter_idx in range(len(secret_word)):
-			correctly_guessed_dictionary[letter_idx] = word[letter_idx]
+			correctly_guessed_dictionary[letter_idx] = secret_word[letter_idx]
 
 	print("word is {} and difficulty_level is {}".format(secret_word, word_game.difficulty_level))
 
@@ -237,7 +237,7 @@ def check():
 		# extra backend validation to make sure the letter is actually a letter, and is one character in length
 		if len(letter) != 1 or not letter.isalpha():
 			game_response["message"] = "invalid input"
-			return jsonify("game_response")
+			return jsonify(game_response)
 
 		# Checks if the letter in the word has already been guessed.
 		if word_game.is_already_guessed_letter(letter):
@@ -322,14 +322,14 @@ def check_word():
 		game_response["score"] = word_game.get_score()
 		return jsonify(game_response)
 
-		# checks to make sure entered word is the same length as secret word
+	# checks to make sure entered word is the same length as secret word
 	elif word_game.get_word_length() != len(guessed_word):
 		game_response["message"] = "Invalid entry! make sure your guess is the same length as the secret word"
 		return jsonify(game_response)
 
 	# extra step to verify that input is all letters (also done in html)
 	elif not guessed_word.isalpha():
-		game_response["message"] == "invalid input"
+		game_response["message"] = "invalid input"
 		return jsonify(game_response)
 
 	# A method in Game class to compare the word to the secret word

@@ -158,6 +158,8 @@ function getNewWord(evt) {
 	// hides modal if displayed
 	let modal = document.getElementById('play-modal');
 		$("#word-to-guess").empty();
+
+
 		$("#incorrect-words-guessed-list").empty()
 		$("#incorrect-letters-guessed-list").empty()
 		modal.style.display="none";
