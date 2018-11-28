@@ -10,7 +10,7 @@ class Game:
 	# a class attribute, which is a dictionary to store words at difficulty levels
 	words = {}
 
-	def __init__(self, difficulty_level="3"):
+	def __init__(self, difficulty_level="1"):
 		''' initializes a game with instance attributes below '''
 
 		self.word = Game._make_new_word(difficulty_level=difficulty_level)
@@ -30,7 +30,7 @@ class Game:
 
 
 	@staticmethod
-	def _make_new_word(difficulty_level="3"):
+	def _make_new_word(difficulty_level="1"):
 		''' a method to get all the words from API at a specified difficulty level, and pick one at random '''
 		
 		# Checks if the difficulty level key is already in the dictionary
@@ -86,6 +86,12 @@ class Game:
 
 		remaining_guesses = self.max_incorrect_guesses - self.incorrect_guesses
 		return remaining_guesses
+
+
+	def get_incorrectly_guessed_words(self):
+		''' returns the set of incorrectly guessed words'''
+
+		return self.incorrect_words_guessed  
 
 
 	def lose(self):

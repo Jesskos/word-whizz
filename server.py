@@ -46,11 +46,11 @@ def log_in():
 			session["user_id"] = existing_user.user_id
 			session["name"] = existing_user.username
 
-			# creates a session with a default difficulty level of '3', and instantiates a new game
+			# creates a session with a default difficulty level of '1', and instantiates a new game
 			# in the future, I would like the user to be able to choose a difficulty level when registering/signing up and change it in his/her profile
 			# global word_game
 			global users_playing
-			session["difficulty_level"] = "3"
+			session["difficulty_level"] = "1"
 			users_playing[session["user_id"]] = Game(session["difficulty_level"])
 
 			# when user logs in, flashes a message that they have successfully logged in (see html templating)
@@ -88,11 +88,11 @@ def sign_up():
 		session["user_id"] = new_user.user_id
 		session["name"] = new_user.username
 
-		# Creates a session with a default difficulty level of '3'
+		# Creates a session with a default difficulty level of '1'
 		# In the future, the user will be able to choose a difficulty level when registering/signing up and change it in their profile
 		# A new game object is instantiated when sign up process is completed, and added to the dictionary users_playing
 		global users_playing
-		session["difficulty_level"] = "3"
+		session["difficulty_level"] = "1"
 		users_playing[session["user_id"]] = Game(session["difficulty_level"])
 
 
@@ -116,7 +116,7 @@ def log_out():
 
 	# Removes user_id, name, and difficulty level from the session to log out user, and redirects back to index
 	if "user_id" in session:
-		# del users_playing[session["user_id"]]
+		del users_playing[session["user_id"]]
 		del session["user_id"]
 		del session["name"]
 		del session["difficulty_level"]
@@ -133,14 +133,19 @@ def play():
 		return redirect("/")
 
 	# gets global variable users_playing, and finds the user's word based on the session user_id
-
 	word_game = users_playing[session["user_id"]]
+	# try:
+	# 	word_game = users_playing[session["user_id"]]
+	# except:
+	# 	word_game = Game()
+	# 	users_playing[session["user_id"]] = word_game
 
-	word = word_game.get_word()
+	secret_word = word_game.get_word()
 	
 	# Gets the length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses using class methods or attributes
 	# When the page is refreshed, game will pick up where it left off
 	incorrect_guessed_letters = word_game.incorrect_guessed_letters
+	incorrectly_guessed_words = word_game.get_incorrectly_guessed_words()
 	correctly_guessed_letters = word_game.correct_guessed_letters
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
@@ -157,14 +162,15 @@ def play():
 				correctly_guessed_dictionary[index] = letter
 
 	else:
-		for letter_idx in range(len(word)):
+		for letter_idx in range(len(secret_word)):
 			correctly_guessed_dictionary[letter_idx] = word[letter_idx]
 
-	print("word is {} and difficulty_level is {}".format(word, word_game.difficulty_level))
+	print("word is {} and difficulty_level is {}".format(secret_word, word_game.difficulty_level))
 
 	# Renders variables using Jinja2 templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
-		incorrectly_guessed = incorrect_guessed_letters, correctly_guessed = correctly_guessed_dictionary, 
+		incorrectly_guessed = incorrect_guessed_letters, words_incorrectly_guessed=incorrectly_guessed_words,
+		correctly_guessed = correctly_guessed_dictionary, 
 		difficulty_level=session["difficulty_level"], name=session["name"])
 
 
@@ -308,8 +314,7 @@ def check_word():
 	game_response = {}
 
 	# receives the guessed word from a request, and makes it lowecase
-	guessed_word = request.args.get('word')
-	guessed_word = guessed_word.lower()
+	guessed_word = request.args.get('word').lower()
 
 	# Checks to make sure the game has not already ended before carrying out logic
 	if word_game.game_over():
@@ -328,19 +333,20 @@ def check_word():
 		return jsonify(game_response)
 
 	# A method in Game class to compare the word to the secret word
-	checked_word = word_game.check_word(guessed_word)
+	guess_correct = word_game.check_word(guessed_word)
 
 	# gets remainig guesses, which is to be sent in response to all conditions below
-	remaining_guesses = word_game.guesses_left()
-	game_response["remaining_guesses"]=remaining_guesses
+	game_response["remaining_guesses"]= word_game.guesses_left()
 
 	# checks if the user guessed the correct word. If so, sends a message and the full word
-	if checked_word:
+	if guess_correct:
 		game_response["message"] = "You Win! You guessed the word correctly"
 		game_response["secret_word"] = word_game.get_word()
 
 	else:
+		# adds guessed_word to the response to be sent
 		game_response["guessed_word"] = guessed_word
+
 		# checks if user lost the game
 		if word_game.lose():
 			game_response["message"] = "{} is not the word. Sorry, you have lost the game".format(guessed_word)
@@ -350,7 +356,6 @@ def check_word():
 		else:
 			game_response["message"] = "Sorry, your guess was incorrect. {} is not the word".format(guessed_word)
 			
-
 	# saves word game 
 	if word_game.win() or word_game.lose():
 		save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win())					

@@ -82,14 +82,28 @@
 
  <!-- Incorrect Letters Storage -->
 
-  <div id="incorrect-letters-guessed" class="container-vertical">
-    <div id="incorrect-guesses-tried"><h4>Incorrect Letters Tried</h4></div>
-    <div id="incorrect-letters-guessed-list">
-      {% for letter in incorrectly_guessed %}
-        <span>{{letter}}</span> 
-      {% endfor %}
+  <div id="incorrect-letters-guessed" class="container">
+
+    <div>
+       <h4>Incorrect Letters Tried</h4>
+       <div id="incorrect-letters-guessed-list">
+        {% for letter in incorrectly_guessed %}
+          <span>{{letter}}</span> 
+        {% endfor %}
+      </div>
     </div>
+
+    <div>
+       <h4>Incorrect Words Tried</h4>
+       <div id="incorrect-words-guessed-list">
+        {% for word in words_incorrectly_guessed %}
+          <span>{{word}}</span> 
+        {% endfor %}
+      </div>
+    </div>
+
   </div>
+
 
 
     <!-- Modal content -->

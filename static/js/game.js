@@ -84,10 +84,12 @@ function getUpdateAfterCheckWord(results) {
 
 	// if the user does not guess the word correctly, also lets them know without showing entire word
 	} else if (results["message"].includes("guess was incorrect")) {
+		$("#incorrect-words-guessed-list").append(results['guessed_word'] + " ");
 		alert(results["message"]);
 
 	// if the user loses the game, lets them know and shows entire word
 	} else if (results["message"].includes("lost the game")) {
+		$("#incorrect-words-guessed-list").append(results['guessed_word'] + " ");
 		$("#word-to-guess").html(results['secret_word']);
 		showModal(results["message"], results["score"]);
 
@@ -156,6 +158,7 @@ function getNewWord(evt) {
 	// hides modal if displayed
 	let modal = document.getElementById('play-modal');
 		$("#word-to-guess").empty();
+		$("#incorrect-words-guessed-list").empty()
 		$("#incorrect-letters-guessed-list").empty()
 		modal.style.display="none";
 
@@ -177,6 +180,7 @@ function makeNewGame(evt) {
 	// clears out old words and letters to prepare for new word
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
+	$("#incorrect-words-guessed-list").empty()
 
 	// resets anti-progress bar to start new game
 	let progressBar = document.getElementById("myBar");
@@ -215,6 +219,7 @@ function changeDifficulty(evt) {
 	$("#word-to-guess").empty();
 	$("#incorrect-letters-guessed-list").empty()
 	$("#Difficulty").empty()
+	$("#incorrect-words-guessed-list").empty()
 
 	// makes an AJAX request to the route in server below with the new diffiuclty level, and receives a response with a new word at that difficulty level
 	$.get('/play_again', difficultyChoice, (results) => {
