@@ -116,7 +116,7 @@ def log_out():
 
 	# Removes user_id, name, and difficulty level from the session to log out user, and redirects back to index
 	if "user_id" in session:
-		del users_playing[session["user_id"]]
+		# del users_playing[session["user_id"]]
 		del session["user_id"]
 		del session["name"]
 		del session["difficulty_level"]
