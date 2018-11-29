@@ -8,14 +8,13 @@ import requests
 class GameTestsWhilePlaying(unittest.TestCase):
 	''' unit tests for methods in Game class for a user who makes a guess that neither causes a win nor loss '''
 
-	TEST_WORD = "chocolate"
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
 		Attributes set up to test the condition of neither winning or losing the game'''
 
 		self.word_game=Game()
-		self.word_game.word=GameTestsWhilePlaying.TEST_WORD
+		self.word_game.word= "chocolate"
 		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
 		self.word_game.correct_guessed_letters = set(['c', 'o'])
 		self.word_game.incorrect_guessed_letters = set(['i', 's'])
@@ -28,13 +27,13 @@ class GameTestsWhilePlaying(unittest.TestCase):
 	def test_get_word(self):
 		''' tests method get_word method '''
 
-		self.assertEqual(self.word_game.get_word(), GameTestsWhilePlaying.TEST_WORD)
+		self.assertEqual(self.word_game.get_word(), self.word_game.word)
 	
 
 	def test_get_word_length(self):
 		'''tests method get_word_length '''
 
-		self.assertEqual(self.word_game.get_word_length(), len(GameTestsWhilePlaying.TEST_WORD))
+		self.assertEqual(self.word_game.get_word_length(), len(self.word_game.word))
 
 
 	def test_check_letter_in_word(self):
