@@ -125,6 +125,7 @@ input[type=submit] {
 
 #incorrect-letters-guessed {
 	font-size: 30px;
+	height: 80px;
 }
 
 #incorrect-guesses-tried {
