@@ -88,12 +88,38 @@ class Game:
 		return remaining_guesses
 
 
+	def get_incorrectly_guessed_letters(self):
+		''' gets the set of incorrectly guessed letters '''
+
+		return self.incorrect_guessed_letters
+
+
+	def get_correct_guessed_letters(self):
+		''' gets the set of correctly guessed letters '''
+
+		return self.correct_guessed_letters
+
+
+	def get_incorrect_guessed_letters(self):
+		''' gets the set of incorrectly guessed letters '''
+
+		return self.incorrect_guessed_letters
+
+
 	def get_incorrectly_guessed_words(self):
 		''' returns the set of incorrectly guessed words'''
 
 		return self.incorrect_words_guessed  
 
 
+	def already_guessed_word(self, word):
+		''' checks if word has already been gussed'''
+
+		if word in self.incorrect_words_guessed:
+			return True
+		return False
+
+		
 	def lose(self):
 		''' ends the game when the user exceeds allotted guesses'''
 

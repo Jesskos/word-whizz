@@ -4,6 +4,19 @@ from unittest.mock import patch
 import requests
 
 
+class GameTestProperties(unittest.TestCase):
+	''' tests that game properties are instantiated correctly '''
+
+	def test_create_game(self):
+		''' tests difficulty level defaults to 1 if no arguments '''
+		g = Game()
+		self.assertEqual(g.difficulty_level, "1")
+
+	def test_create_game_argument(self):
+		''' tests difficulty level defaults to 1 if no arguments '''
+		g = Game("3")
+		self.assertEqual(g.difficulty_level, "3")
+
 
 class GameTestsWhilePlaying(unittest.TestCase):
 	''' unit tests for methods in Game class for a user who makes a guess that neither causes a win nor loss '''
@@ -64,6 +77,24 @@ class GameTestsWhilePlaying(unittest.TestCase):
 		''' tests method is_already_guessed_letter for a letter that has been guessed'''
 
 		self.assertEqual(self.word_game.is_already_guessed_letter(self.letters[0]), True)
+
+
+	def test_is_already_guessed_word_for_word_already_guessed(self):
+		''' tests method already_guessed_word for a word which is already guessed '''
+
+		self.assertEqual(self.word_game.already_guessed_word('berry'), True)
+
+
+	def test_get_correct_guessed_letters(self):
+		''' tests that the set of correctly guessed letters is returned '''
+
+		self.assertEqual(self.word_game.get_correct_guessed_letters(), set(['c', 'o']))
+
+
+	def test_get_incorrect_guessed_letters(self):
+		''' tests that the set of incorrectly guessed letters is returned '''
+
+		self.assertEqual(self.word_game.get_incorrect_guessed_letters(), set(['i', 's']))
 
 
 	def test_guesses_left(self):
