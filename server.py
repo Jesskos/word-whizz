@@ -146,9 +146,9 @@ def play():
 	
 	# Gets the length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses using class methods or attributes
 	# When the page is refreshed, game will pick up where it left off
-	incorrect_guessed_letters = word_game.incorrect_guessed_letters
+	incorrect_guessed_letters = word_game.get_incorrectly_guessed_letters()
 	incorrectly_guessed_words = word_game.get_incorrectly_guessed_words()
-	correctly_guessed_letters = word_game.correct_guessed_letters
+	correctly_guessed_letters = word_game.get_correct_guessed_letters()
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()
 
@@ -318,6 +318,9 @@ def check_word():
 	# receives the guessed word from a request, and makes it lowecase
 	guessed_word = request.args.get('word').lower()
 
+	# number of remaining guesses left
+	game_response["remaining_guesses"] = word_game.guesses_left()
+
 	# Checks to make sure the game has not already ended before carrying out logic
 	if word_game.game_over():
 		game_response["message"] = "The game is over. Please choose to play again"
@@ -332,6 +335,10 @@ def check_word():
 	# extra step to verify that input is all letters (also done in html)
 	elif not guessed_word.isalpha():
 		game_response["message"] = "invalid input"
+		return jsonify(game_response)
+
+	elif word_game.already_guessed_word(guessed_word):
+		game_response["message"] = "word already guessed"
 		return jsonify(game_response)
 
 	# A method in Game class to compare the word to the secret word
