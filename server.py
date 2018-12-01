@@ -4,7 +4,7 @@ import requests
 from model import connect_to_db, db, User, Score
 from datetime import datetime
 
-# create an instance of the flask application.__name__ tells Flask where to look for files, templates, etc.
+# create an instance of the flask application.__name__ is unique file
 app = Flask(__name__)
 
 # creates a dictionary of users playing as the key value and the current word that user is trying to solve as the value
@@ -440,7 +440,7 @@ def view_game_history():
 
 
 
-
+# if you run the file directly, will run code below
 if __name__ == "__main__": # pragma: no cover
 	connect_to_db(app)  # pragma: no cover
 	app.run(debug = True) # pragma: no cover
