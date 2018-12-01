@@ -45,20 +45,19 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 
 * The user can sign up or log in to play the game 
 
-<center>![Alt Text](/static/gifs/sign_up_log_in.gif)</center>
+![GIF](/static/gifs/sign_up_log_in.gif)
 
 * The user is shown an empty word, and must guess the letters in the word per the rules states above 
 
-<center>![Alt Text](/static/gifs/Play_word_game.gif) </center>
+![GIF](/static/gifs/Play_word_game.gif) 
 
 * The user can try to guess the full word at the expense of losing one attempt
 
-<center> ![Alt Text](/static/gifs/guess_word.gif) </center>
+![GIF](/static/gifs/guess_word.gif) 
 
 * The user can reset the game, and change difficulty level 
 
-<center> ![Alt Text](/static/gifs/change_difficulty.gif) </center>
-
+![GIF](/static/gifs/change_difficulty.gif)
 * The user can view their score history, and view the leaderboard
 
 
