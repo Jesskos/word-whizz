@@ -49,7 +49,7 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 
 * The user is shown an empty word, and must guess the letters in the word per the rules states above (shown)
 
-![Alt Text](/static/gifs/Play_word_game.gif.gif)
+![Alt Text](/static/gifs/Play_word_game.gif)
 
 * The user can guess attempt to word at the expense of losing one attempt
 
