@@ -53,7 +53,7 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 
 * The user can try to guess the full word at the expense of losing one attempt
 
-![GIF](/static/gifs/guess_word.gif) 
+![GIF](/static/gifs/guessword.gif) 
 
 * The user can reset the game, and change difficulty level 
 
