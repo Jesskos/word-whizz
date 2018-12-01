@@ -10,6 +10,7 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 * [Game Rules](#game-rules)
 * [Game Guidelines](#game-guidelines)
 * [Features](#features)
+* [Features](#features)
 * [Design Decisions](#design-decisions)
 * [Setup](#setup)
 * [Version 2.0](#Version-2.0)
@@ -40,6 +41,26 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 * The computer awards more points at higher word difficulty levels.
 * The computer will still award points if the player loses the game, but does not award points if the player does not finish the game.
 
+### FEATURES
+
+* The user can sign up or log in to play the game 
+
+![Alt Text](/static/gifs/sign_up_log_in.gif)
+
+* The user is shown an empty word, and must guess the letters in the word per the rules states above (shown)
+
+![Alt Text](/static/gifs/Play_word_game.gif.gif)
+
+* The user can guess attempt to word at the expense of losing one attempt
+
+* The user can reset the game, and change difficulty level 
+
+![Alt Text](/static/gifs/change_difficulty.gif)
+
+* The user can view their score history, and view the leaderboard
+
+
+
 ### SETUP
 
 1. Clone the repository to a local directory 
@@ -64,6 +85,7 @@ Coming soon!
 * The player can create a profile, and adjust the default difficulty level in the profile. 
 * The player can adjust minimum and maximum length of the word.
 * The player will not be able to receive the same word more than once. 
+
 
 ### About the Developer
 Jessica is a software engineer and former clinical dietitian based out of San Francisco.
