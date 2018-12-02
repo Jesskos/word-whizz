@@ -57,11 +57,11 @@ Points are awarded for guessing letters correctly, even if the player loses, in 
 
 * The user can reset the game, and change difficulty level 
 
-![GIF](/static/gifs/change_difficulty.gif)
+![GIF](/static/gifs/change_difficulty_2.gif)
 
 * The user can view their own score and word history, and view the leaderboard to see the ranks of all of the players
 
-![GIF](/static/gifs/leaderboard.gif)
+![GIF](/static/gifs/leaderboard_2.gif)
 
 ### SETUP
 
