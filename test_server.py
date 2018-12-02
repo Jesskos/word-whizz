@@ -14,6 +14,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 		# test_client simulates that the server is running
 		# app defined inside server
+		# tells flask that we are testing
 		app.config['TESTING'] = True
 
 		# gets the flask test client

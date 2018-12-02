@@ -151,7 +151,7 @@ class Game:
 			self.correct_guessed_letters = set(list(self.word))
 			return True
 		else:
-			self.incorrect_words_guessed.add(word)
+			self.incorrect_words_guessed.add(guessed_word)
 			self.incorrect_guesses += 1
 
 
