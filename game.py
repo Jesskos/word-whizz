@@ -146,9 +146,9 @@ class Game:
 		return False
 
 
-	def check_word(self, word):
-		if word == self.word:
-			self.correct_guessed_letters = set(list(word))
+	def check_word(self, guessed_word):
+		if guessed_word == self.word:
+			self.correct_guessed_letters = set(list(self.word))
 			return True
 		else:
 			self.incorrect_words_guessed.add(word)
@@ -165,8 +165,6 @@ class Game:
 
 	def get_score(self):
 		''' gets the score at the end of the game'''
-
-		length_word = self.get_word_length()
 
 		base_score = 10
 		point_gains = len(self.correct_guessed_letters) * 10
