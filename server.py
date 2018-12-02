@@ -182,10 +182,6 @@ def play_again():
 
 	# Using the global users_playing dictionary, gets the current word
 	global users_playing
-	word_game = users_playing[session["user_id"]]
-	
-	word_game = Game()
-	users_playing[session["user_id"]] = word_game
 	
 	# Checks if user changed the difficulty level. Returns None if the user has not changed the difficutly level.
 	new_difficulty_level = request.args.get('difficulty-level')
