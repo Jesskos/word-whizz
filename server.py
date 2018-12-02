@@ -244,7 +244,7 @@ def check():
 
 		# If the letter has not been gussed yet, checks whether or not the letter is in the word
 		else:
-			checked_letter = word_game.check_letter(letter)
+			letter_in_word = word_game.check_letter(letter)
 			remaining_guesses = word_game.guesses_left()
 			indices_of_letter_in_word = word_game.get_indices_of_letter_in_word(letter)
 
@@ -253,7 +253,7 @@ def check():
 			game_response["remaining_guesses"]=remaining_guesses
 
 			# Enters this condition if the checked_letter is in the word
-			if checked_letter:
+			if letter_in_word:
 
 				# If the checked letter is in the word, index/indices of the checked letter in the word are included in the response.
 				game_response['indices'] = indices_of_letter_in_word
@@ -275,7 +275,7 @@ def check():
 				else:
 					game_response["message"] = "Great Work! Correct Guess!"
 
-			# Enter this condition since the checked_letter was not in the word
+			# Enter this condition since the letter_in_word was False
 			else:
 
 				# Enter this condition if player runs out of remaining guesses, and loses
@@ -314,9 +314,6 @@ def check_word():
 	# receives the guessed word from a request, and makes it lowecase
 	guessed_word = request.args.get('word').lower()
 
-	# number of remaining guesses left
-	game_response["remaining_guesses"] = word_game.guesses_left()
-
 	# Checks to make sure the game has not already ended before carrying out logic
 	if word_game.game_over():
 		game_response["message"] = "The game is over. Please choose to play again"
@@ -337,14 +334,14 @@ def check_word():
 		game_response["message"] = "word already guessed"
 		return jsonify(game_response)
 
-	# A method in Game class to compare the word to the secret word
-	guess_correct = word_game.check_word(guessed_word)
+	# number of remaining guesses left
+	guessed_correctly = word_game.check_word(guessed_word)
 
 	# Gets remainig guesses, which is to be sent in response to all conditions below
 	game_response["remaining_guesses"] = word_game.guesses_left()
 
 	# checks if the user guessed the correct word. If so, sends a message and the full word
-	if guess_correct:
+	if guessed_correctly:
 		game_response["message"] = "You Win! You guessed the word correctly"
 		game_response["secret_word"] = word_game.get_word()
 
