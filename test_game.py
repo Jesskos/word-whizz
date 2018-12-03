@@ -13,7 +13,7 @@ class GameTestProperties(unittest.TestCase):
 		self.assertEqual(g.difficulty_level, "1")
 
 	def test_create_game_argument(self):
-		''' tests difficulty level defaults to 1 if no arguments '''
+		''' tests difficulty level takes the diffiuclty level assigned in argument '''
 		g = Game("3")
 		self.assertEqual(g.difficulty_level, "3")
 
