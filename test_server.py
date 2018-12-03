@@ -45,29 +45,17 @@ class ServerTestsLoggedIn(unittest.TestCase):
 	def test_index_route_when_logged_in(self):
 		''' integration test to test home page renders correct information when user is logged in '''
 
-		
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.users_playing = {1:self.word_game}
-
-		# mocking users_playing
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/", follow_redirects=True)
-			self.assertIn(b"Play Word Game", result.data)
-			self.assertEqual(result.status_code, 200)
+		result = self.client.get("/", follow_redirects=True)
+		self.assertIn(b"Play Word Game", result.data)
+		self.assertEqual(result.status_code, 200)
 
 
 	def test_game_route_when_logged_in(self):
 		''' Integratin test to test play route renders correct infomation when user is logged in '''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/play")
-			self.assertIn(b"Play Word Game", result.data)
-			self.assertEqual(result.status_code, 200)
+		result = self.client.get("/play")
+		self.assertIn(b"Play Word Game", result.data)
+		self.assertEqual(result.status_code, 200)
 
 
 	def test_view_history_route_when_logged_in(self):
