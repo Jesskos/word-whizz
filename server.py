@@ -248,7 +248,7 @@ def check():
 			remaining_guesses = word_game.guesses_left()
 			indices_of_letter_in_word = word_game.get_indices_of_letter_in_word(letter)
 
-			# sends the letter and the remaining guesses during all of the below scenarios
+			# Adds the letter and remaining guesses to JSON response
 			game_response['letter'] = letter
 			game_response["remaining_guesses"]=remaining_guesses
 
@@ -323,6 +323,7 @@ def check_word():
 	# checks to make sure entered word is the same length as secret word
 	elif word_game.get_word_length() != len(guessed_word):
 		game_response["message"] = "Invalid entry! make sure your guess is the same length as the secret word"
+		game_response["remaining_guesses"] = word_game.guesses_left()
 		return jsonify(game_response)
 
 	# extra step to verify that input is all letters (also done in html)
