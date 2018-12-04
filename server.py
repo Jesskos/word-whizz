@@ -210,7 +210,7 @@ def play_again():
 
 @app.route('/check', methods=['GET'])
 def check():
-	''' carries out came logic, and responds with appropriate message and information to AJAX calls from the browser '''
+	''' carries out game logic, and responds with appropriate message and information to AJAX calls from the browser '''
 
 	# An empty dictinary to be converted into JSON 
 	game_response = {}
