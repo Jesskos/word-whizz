@@ -102,7 +102,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 		''' tests rules'''
 
 		result = self.client.get("/rules")
-		self.assertIn(b"Guiedlines", result.data)
+		self.assertIn(b"Guidelines", result.data)
 
 
 class ServerTestsNotLoggedIn(unittest.TestCase):
