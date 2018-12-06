@@ -431,7 +431,7 @@ def view_game_history():
 	return render_template('history.html', game_history=game_record, name=session["name"], scores_total=sum_scores)
 
 
-@app.route('/rules')
+@app.route('/game_rules')
 def get_rules():
 	''' gets game rules '''
 

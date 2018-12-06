@@ -101,7 +101,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 	def test_rules(self):
 		''' tests rules'''
 
-		result = self.client.get("/rules")
+		result = self.client.get("/game_rules")
 		self.assertIn(b"Guidelines", result.data)
 
 
