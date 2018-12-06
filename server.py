@@ -433,7 +433,12 @@ def view_game_history():
 
 @app.route('/rules')
 def get_rules():
-	return render_template('rules.html')
+	''' gets game rules '''
+
+	if "user_id" not in session:
+		return redirect("/")
+
+	return render_template('rules.html', name=session["name"])
 
 # if you run the file directly, will run code below
 if __name__ == "__main__": # pragma: no cover
