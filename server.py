@@ -431,8 +431,9 @@ def view_game_history():
 	return render_template('history.html', game_history=game_record, name=session["name"], scores_total=sum_scores)
 
 
-
-
+@app.route('/rules')
+def get_rules():
+	return render_template('rules.html')
 
 # if you run the file directly, will run code below
 if __name__ == "__main__": # pragma: no cover
