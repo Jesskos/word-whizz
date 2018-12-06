@@ -98,6 +98,11 @@ class ServerTestsLoggedIn(unittest.TestCase):
 			self.assertIn(b"Sign Up/Log In Page", result.data)
 			self.assertEqual(result.status_code, 200)
 
+	def test_rules(self):
+		''' tests rules'''
+
+		result = self.client.get("/rules")
+		self.assertIn(b"Guidelines", result.data)
 
 
 class ServerTestsNotLoggedIn(unittest.TestCase):
@@ -341,7 +346,7 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 		self.word_game = Game()
 		self.word_game.word = "berry"
 		self.users_playing = {1:self.word_game}
-		with patch('server.users_playing',self.users_playing):
+		with patch('server.users_playing', self.users_playing):
 			result = self.client.get("/play_again", query_string={'difficulty-level': ''})
 			self.assertIn(b'"difficulty_level": "3"', result.data)
 			self.assertNotIn(b'"difficulty_level": "8"', result.data)
