@@ -371,6 +371,7 @@ def check_word():
 		find_current_game.completed = True
 		find_current_game.score = word_game.get_score()
 		find_current_game.won = word_game.win()		
+		game_response["score"] = word_game.get_score()
 
 	else:
 		find_current_game.game_information = ending_game_info
