@@ -120,8 +120,7 @@ def log_out():
 	# Removes user_id, name, and difficulty level from the session to log out user, and redirects back to index
 		# del users_playing[session["user_id"]]
 
-	if session['user_id'] in users_playing:
-		del users_playing[session["user_id"]]
+	del session["game_id"]
 	del session["user_id"]
 	del session["name"]
 	del session["difficulty_level"]
@@ -146,9 +145,6 @@ def play():
 		incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
 
 	secret_word = word_game.get_word()
-	
-	# Gets the length of word, incorrect_guessed_letters, length_of_word, and remaining_guesses using class methods or attributes
-	# When the page is refreshed, game will pick up where it left off
 	incorrect_guessed_letters = word_game.get_incorrectly_guessed_letters()
 	incorrectly_guessed_words = word_game.get_incorrectly_guessed_words()
 	correctly_guessed_letters = word_game.get_correct_guessed_letters()
@@ -171,6 +167,8 @@ def play():
 			correctly_guessed_dictionary[letter_idx] = secret_word[letter_idx]
 
 	print("word is {} and difficulty_level is {}".format(secret_word, word_game.difficulty_level))
+
+	print("play game_info is {}".format(game_info))
 
 	# Renders variables using Jinja2 templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
@@ -210,13 +208,18 @@ def play_again():
 def check():
 	''' carries out game logic, and responds with appropriate message and information to AJAX calls from the browser '''
 
-	# An empty dictinary to be converted into JSON 
-	game_response = {}
+	# finds game in database (this can be cached at a later point)
+	find_current_game = Score.query.filter_by(score_id=session["game_id"]).first()
+	game_info = json.loads(find_current_game.game_information)
+	word_game = Game(word = game_info["word"], correct_guessed_letters = set(game_info["correct_guessed_letters"]),  
+		incorrect_guessed_letters = set(game_info["incorrect_guessed_letters"]), incorrect_guesses=game_info["incorrect_guesses"],
+		incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
 
-	# gets the current word the user is playing from the users_playing dictionary
-	global users_playing
-	word_game = users_playing[session["user_id"]]
-	print("session id is {} for user {} and the word is {}".format(session["user_id"], session["name"], word_game.get_word()))
+	print("BEGINNING game_info is ... {}".format(game_info))
+	print("current game id is {}".format(find_current_game))
+	print("word_game incorrect_guesses = {}".format(word_game.incorrect_guesses))
+
+	game_response = {}
 
 	# Checks to make sure the game has not already ended
 	if word_game.game_over():
@@ -262,12 +265,6 @@ def check():
 					# Adds a message and final score to the response
 					game_response['message'] = "You win!"
 					game_response["score"] = word_game.get_score()
-
-					# Saves the game to the database along with the corresponding user_id, word score, and whether or not they won
-					save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), 
-						won=word_game.win())
-					db.session.add(save_game)
-					db.session.commit()
 				
 				# If the player has not won, they correctly guesses the letter. A message to inform them they guessed the correct letter is included in the response.
 				else:
@@ -284,16 +281,23 @@ def check():
 					game_response["secret_word"] = word_game.get_word()
 					game_response["score"] = word_game.get_score()
 
-					# saves the game to the database
-					save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), 
-						won=word_game.win())					
-					db.session.add(save_game)
-					db.session.commit()
-
 				# Enter this condition if player still has remaining guesses, and can continue playing
 				else: 
 					game_response["message"] = "Sorry, Incorrect Guess! {} is not in the word. You have {} chances remaining".format(letter, remaining_guesses)
 
+
+			ending_game_info = word_game.stringify_attributes()
+			print("ENDING game_info is ... {}".format(ending_game_info))
+			if word_game.lose() or word_game.win():
+				find_current_game.game_information = ending_game_info
+				find_current_game.completed = True
+				find_current_game.score = word_game.get_score()
+				find_current_game.won = word_game.win()		
+
+			else:
+				find_current_game.game_information = ending_game_info
+
+			db.session.commit()
 	# Sends a response to the browser
 	return jsonify(game_response)
 
