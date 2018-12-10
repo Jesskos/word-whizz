@@ -139,21 +139,15 @@ class GameTestsWhilePlaying(unittest.TestCase):
 class WinningGameTests(unittest.TestCase):
 	''' unit tests for methods in Game class when a user has won'''
 
-	TEST_WORD = "chocolate"
 
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
 		Attributes set up to test the condition when a user wins the game'''
 
-		self.word_game=Game()
-		self.word_game.word=WinningGameTests.TEST_WORD
-		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
+		self.word_game=Game(word="chocolate", correct_guessed_letters = set(['c', 'o', 'h', 'l', 'a', 't', 'e']), difficulty_level = '2',
+			incorrect_guessed_letters = set(['i', 's']), incorrect_guesses=2, max_incorrect_guesses=6)
 		# set attribute correct_guessed_letters to include all letters in final word to test win() method
-		self.word_game.correct_guessed_letters = set(['c', 'o', 'h', 'l', 'a', 't', 'e'])
-		self.word_game.difficulty_level = 2
-		self.word_game.incorrect_guessed_letters = set(['i', 's'])
-		self.word_game.incorrect_guesses = 2 
-		self.word_game.max_incorrect_guesses = 6
+
 		self.letters = ['c', 'f', 'g']
 
 
@@ -191,20 +185,12 @@ class LosingGameTests(unittest.TestCase):
 	''' unit tests for methods in Game class when a user has lost'''
 
 
-	TEST_WORD = "chocolate"
-
 	def setUp(self):
 		''' sets the attributes in the init method to perform tests
 		Attributes set up to test the condition when a user loses the game'''
 
-		self.word_game=Game()
-		self.word_game.word=WinningGameTests.TEST_WORD
-		self.word_game.difficulty_level = 2
-		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
-		self.word_game.correct_guessed_letters = set(['c', 'o'])
-		self.word_game.incorrect_guessed_letters = set(['i', 's', 'd', 'f', 'g', 'z'])
-		self.word_game.incorrect_guesses = 6 
-		self.word_game.max_incorrect_guesses = 6
+		self.word_game=Game(word="chocolate", difficulty_level=2, correct_guessed_letters=set(['c', 'o']), incorrect_guessed_letters= set(['i', 's', 'd', 'f', 'g', 'z']),
+		incorrect_guesses = 6, max_incorrect_guesses=6)
 		self.letters = ['c', 'f', 'g']
 
 
@@ -232,6 +218,21 @@ class LosingGameTests(unittest.TestCase):
 		self.assertEqual(self.word_game.get_score(), 48)
 
 
+class StringifyAttributes(unittest.TestCase):
+	''' tests method stringify attributes '''
+
+	def setUp(self):
+		''' sets the attributes in the init method to perform tests
+		Attributes set up to test the condition when a user loses the game'''
+
+		self.word_game=Game(word="chocolate", difficulty_level=2, correct_guessed_letters=set(['c']), incorrect_guessed_letters= set(['i']),
+		incorrect_guesses = 6, max_incorrect_guesses=6)
+
+	def test_stringify_attributes(self):
+		''' tests method stringify_attributes'''
+
+		attributes_str = '{"word": "chocolate", "correct_guessed_letters": ["c"], "incorrect_guessed_letters": ["i"], "incorrect_guesses": 6, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}'
+		self.assertEqual(attributes_str, self.word_game.stringify_attributes())
 
 class ApiGameTest(unittest.TestCase):
 	''' test functionality of API, and finding words of appropriate difficulty_level'''
