@@ -28,6 +28,7 @@ class Score(db.Model):
 	game_information = db.Column(db.String(200), nullable=False)
 	score = db.Column(db.Integer, nullable=False)
 	won = db.Column(db.Boolean, nullable=False)
+	completed = db.Column(db.Boolean, nullable=False)
 
 	user = db.relationship("User", backref="Score")
 
