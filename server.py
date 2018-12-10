@@ -47,7 +47,7 @@ def log_in():
 			session["difficulty_level"] = "1"
 			word_game = Game(session["difficulty_level"])
 			new_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win(), 
-				game_information=word_game.stringify_attributes())
+				game_information=word_game.stringify_attributes(), completed=False)
 			db.session.add(new_game)
 			db.session.commit()
 			session["game_id"] = new_game.score_id
@@ -92,7 +92,7 @@ def sign_up():
 		session["difficulty_level"] = "1"
 		word_game = Game(session["difficulty_level"])
 		new_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win(), 
-			game_information=word_game.stringify_attributes())
+			game_information=word_game.stringify_attributes(), completed=False)
 		db.session.add(new_game)
 		db.session.commit()
 		print(new_game)
@@ -182,28 +182,23 @@ def play():
 @app.route('/play_again')
 def play_again():
 	''' a route that responds to an AJAX call from the browser to refresh the word '''
-
-	# Using the global users_playing dictionary, gets the current word
-	global users_playing
 	
 	# Checks if user changed the difficulty level. Returns None if the user has not changed the difficutly level.
 	new_difficulty_level = request.args.get('difficulty-level')
+
 
 	# If the user changed the difficulty level, instantiates a new game with the new difficutly level as an argument.
 	# finds the user in the dictionary using the key user_id from the session, and replaces it with the new word
 	if new_difficulty_level:
 		session['difficulty_level'] = new_difficulty_level
-		word_game = Game(new_difficulty_level)
-		users_playing[session["user_id"]] = word_game
-
-	# If the user has not changed the difficulty level, instantiates a new game with the current difficulty level from session passed as an argument
-	# finds the user in the dictionary using the key user_id from the session, and replaces it with the new word
-	else:
-		word_game = Game(session["difficulty_level"])
-		users_playing[session["user_id"]] = word_game
-
-	print("{} is the new difficulty_level and word is {} and difficulty is {}".format(new_difficulty_level, word_game.get_word(), session['difficulty_level']))
-
+	
+	word_game = Game(session["difficulty_level"])
+	new_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win(), 
+		game_information=word_game.stringify_attributes(), completed=False)
+	db.session.add(new_game)
+	db.session.commit()
+	session["game_id"] = new_game.score_id
+	
 	# Gets the length of the word and remaining guesses to send to browser to modify DOM for new word
 	length_word = word_game.get_word_length()
 	remaining_guesses = word_game.guesses_left()

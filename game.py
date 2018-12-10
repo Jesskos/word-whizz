@@ -181,7 +181,7 @@ class Game:
 
 		return self.total_score
 
-	def make_json_string(self):
+	def stringify_attributes(self):
 		''' makes a json string of the attributes ''' 
 
 		game_attributes = {"word": self.word, "correct_guessed_letters": list(self.correct_guessed_letters), 
