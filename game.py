@@ -1,6 +1,7 @@
 import random
 import requests
 from datetime import datetime
+import json
 
 WORD_URL = "http://app.linkedin-reach.io/words"
 
@@ -10,18 +11,22 @@ class Game:
 	# a class attribute, which is a dictionary to store words at difficulty levels
 	words = {}
 
-	def __init__(self, difficulty_level="1"):
+	def __init__(self, difficulty_level="1", word = None, incorrect_guessed_letters=set(), correct_guessed_letters=set(), incorrect_guesses=0, 
+	max_incorrect_guesses=6, incorrect_words_guessed = set(), total_score = 0):
 		''' initializes a game with instance attributes below '''
 
-		self.word = Game._make_new_word(difficulty_level=difficulty_level)
+		if word:
+			self.word = word
+		else:
+			self.word = Game._make_new_word(difficulty_level=difficulty_level)
 		self.difficulty_level = difficulty_level
 		self.word_set = set(self.word)
-		self.correct_guessed_letters = set()
-		self.incorrect_guessed_letters = set()
-		self.incorrect_guesses = 0 
-		self.max_incorrect_guesses = 6
-		self.total_score = 0
-		self.incorrect_words_guessed = set()
+		self.correct_guessed_letters = correct_guessed_letters
+		self.incorrect_guessed_letters = incorrect_guessed_letters
+		self.incorrect_guesses = incorrect_guesses
+		self.max_incorrect_guesses = max_incorrect_guesses
+		self.total_score = total_score
+		self.incorrect_words_guessed = incorrect_words_guessed
 
 	def get_word(self):
 		''' returns the word '''
@@ -176,11 +181,16 @@ class Game:
 
 		return self.total_score
 
+	def make_json_string(self):
+		''' makes a json string of the attributes ''' 
+
+		game_attributes = {"word": self.word, "correct_guessed_letters": list(self.correct_guessed_letters), 
+		"incorrect_guessed_letters": list(self.incorrect_guessed_letters), "incorrect_guesses": self.incorrect_guesses,
+		"max_incorrect_guesses": self.max_incorrect_guesses, "incorrect_words_guessed": list(self.incorrect_words_guessed)}
+
+		return json.dumps(game_attributes)
 
 
-
-	
-		 
 
 
 
