@@ -306,9 +306,11 @@ def check():
 def check_word():
 	''' checks if user guessed the word '''
 
-	# gets the word that the user is currently playing based on the session_id
-	global users_playing
-	word_game = users_playing[session["user_id"]]
+	find_current_game = Score.query.filter_by(score_id=session["game_id"]).first()
+	game_info = json.loads(find_current_game.game_information)
+	word_game = Game(word = game_info["word"], correct_guessed_letters = set(game_info["correct_guessed_letters"]),  
+		incorrect_guessed_letters = set(game_info["incorrect_guessed_letters"]), incorrect_guesses=game_info["incorrect_guesses"],
+		incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
 
 	# an empty dictionary to be sent to the server as a JSON object
 	game_response = {}
@@ -362,11 +364,18 @@ def check_word():
 			game_response["message"] = "Sorry, your guess was incorrect. {} is not the word".format(guessed_word)
 			
 	# saves word game 
-	if word_game.win() or word_game.lose():
-		save_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win())					
-		db.session.add(save_game)
-		db.session.commit()
-		game_response["score"] = word_game.get_score()
+	ending_game_info = word_game.stringify_attributes()
+	print("ENDING game_info is ... {}".format(ending_game_info))
+	if word_game.lose() or word_game.win():
+		find_current_game.game_information = ending_game_info
+		find_current_game.completed = True
+		find_current_game.score = word_game.get_score()
+		find_current_game.won = word_game.win()		
+
+	else:
+		find_current_game.game_information = ending_game_info
+
+	db.session.commit()
 
 	return jsonify(game_response)
 
