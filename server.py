@@ -51,7 +51,6 @@ def log_in():
 			db.session.add(new_game)
 			db.session.commit()
 			session["game_id"] = new_game.score_id
-			print(new_game)
 			# when user logs in, flashes a message that they have successfully logged in (see html templating)
 			flash("you have successfully logged in")
 			return redirect("/play")
@@ -95,7 +94,6 @@ def sign_up():
 			game_information=word_game.stringify_attributes(), completed=False)
 		db.session.add(new_game)
 		db.session.commit()
-		print(new_game)
 		session["game_id"] = new_game.score_id
 
 
@@ -166,10 +164,6 @@ def play():
 		for letter_idx in range(len(secret_word)):
 			correctly_guessed_dictionary[letter_idx] = secret_word[letter_idx]
 
-	print("word is {} and difficulty_level is {}".format(secret_word, word_game.difficulty_level))
-
-	print("play game_info is {}".format(game_info))
-
 	# Renders variables using Jinja2 templating
 	return render_template("game.html", length=length_word, guesses=remaining_guesses, 
 		incorrectly_guessed = incorrect_guessed_letters, words_incorrectly_guessed=incorrectly_guessed_words,
@@ -214,10 +208,6 @@ def check():
 	word_game = Game(word = game_info["word"], correct_guessed_letters = set(game_info["correct_guessed_letters"]),  
 		incorrect_guessed_letters = set(game_info["incorrect_guessed_letters"]), incorrect_guesses=game_info["incorrect_guesses"],
 		incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
-
-	print("BEGINNING game_info is ... {}".format(game_info))
-	print("current game id is {}".format(find_current_game))
-	print("word_game incorrect_guesses = {}".format(word_game.incorrect_guesses))
 
 	game_response = {}
 
@@ -287,7 +277,7 @@ def check():
 
 
 			ending_game_info = word_game.stringify_attributes()
-			print("ENDING game_info is ... {}".format(ending_game_info))
+
 			if word_game.lose() or word_game.win():
 				find_current_game.game_information = ending_game_info
 				find_current_game.completed = True
@@ -365,7 +355,6 @@ def check_word():
 			
 	# saves word game 
 	ending_game_info = word_game.stringify_attributes()
-	print("ENDING game_info is ... {}".format(ending_game_info))
 	if word_game.lose() or word_game.win():
 		find_current_game.game_information = ending_game_info
 		find_current_game.completed = True
