@@ -25,7 +25,7 @@ class Score(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 	date = db.Column(db.DateTime, nullable=False)
 	word = db.Column(db.String(20), nullable=False)
-	game_information = db.Column(db.String(100), nullable=False)
+	game_information = db.Column(db.String(200), nullable=False)
 	score = db.Column(db.Integer, nullable=False)
 	won = db.Column(db.Boolean, nullable=False)
 
@@ -34,8 +34,8 @@ class Score(db.Model):
 	def __repr__(self):
 		""" Provide helpful representation of score object when printed"""
 
-		return "<Score date={}  word={} word={} score={} won={}>".format(self.score_id, 
-			self.date, self.word, self.score, self.won) # pragma: no cover
+		return "<Score score_id={} user_id = {} date={} word={} score={} won={} game_information ={}>".format(self.score_id, 
+			self.user_id, self.date, self.word, self.score, self.won, self.game_information) # pragma: no cover
 
 
 def connect_to_db(app, uri='postgresql:///scoresdb'): # pragma: no cover
