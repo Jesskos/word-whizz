@@ -105,12 +105,6 @@ class Game:
 		return self.correct_guessed_letters
 
 
-	def get_incorrect_guessed_letters(self):
-		''' gets the set of incorrectly guessed letters '''
-
-		return self.incorrect_guessed_letters
-
-
 	def get_incorrectly_guessed_words(self):
 		''' returns the set of incorrectly guessed words'''
 
