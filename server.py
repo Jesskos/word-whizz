@@ -3,12 +3,10 @@ from game import Game
 import requests
 from model import connect_to_db, db, User, Score
 from datetime import datetime
+import json
 
 # create an instance of the flask application.__name__ is unique file
 app = Flask(__name__)
-
-# creates a dictionary of users playing as the key value and the current word that user is trying to solve as the value
-users_playing = {}
 
 # secret key for encrypting sessions
 app.secret_key="w()r|)gvu&&"
@@ -41,18 +39,19 @@ def log_in():
 
 	# if user exists, checks password, to make sure it matches password found in database 
 	# if so, logs user into the game. 
+	# a new game is added to the database
 	else:
 		if existing_user.password == entered_password:
 			session["user_id"] = existing_user.user_id
 			session["name"] = existing_user.username
-
-			# creates a session with a default difficulty level of '1', and instantiates a new game
-			# in the future, I would like the user to be able to choose a difficulty level when registering/signing up and change it in his/her profile
-			# global word_game
-			global users_playing
 			session["difficulty_level"] = "1"
-			users_playing[session["user_id"]] = Game(session["difficulty_level"])
-
+			word_game = Game(session["difficulty_level"])
+			new_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win(), 
+				game_information=word_game.stringify_attributes())
+			db.session.add(new_game)
+			db.session.commit()
+			session["game_id"] = new_game.score_id
+			print(new_game)
 			# when user logs in, flashes a message that they have successfully logged in (see html templating)
 			flash("you have successfully logged in")
 			return redirect("/play")
@@ -89,11 +88,15 @@ def sign_up():
 		session["name"] = new_user.username
 
 		# Creates a session with a default difficulty level of '1'
-		# In the future, the user will be able to choose a difficulty level when registering/signing up and change it in their profile
-		# A new game object is instantiated when sign up process is completed, and added to the dictionary users_playing
-		global users_playing
+		# a new game is added to the database
 		session["difficulty_level"] = "1"
-		users_playing[session["user_id"]] = Game(session["difficulty_level"])
+		word_game = Game(session["difficulty_level"])
+		new_game = Score(date=datetime.now(), user_id=int(session['user_id']), word=word_game.get_word(), score=word_game.get_score(), won=word_game.win(), 
+			game_information=word_game.stringify_attributes())
+		db.session.add(new_game)
+		db.session.commit()
+		print(new_game)
+		session["game_id"] = new_game.score_id
 
 
 		# User is forwarded to play game
@@ -134,13 +137,13 @@ def play():
 	if "user_id" not in session:
 		return redirect("/")
 
-	# gets global variable users_playing, and finds the user's word based on the session user_id
-	# word_game = users_playing[session["user_id"]]
-	try:
-		word_game = users_playing[session["user_id"]]
-	except:
-		word_game = Game()
-		users_playing[session["user_id"]] = word_game
+	find_current_game = Score.query.filter_by(score_id=session["game_id"]).first()
+
+	game_info = json.loads(find_current_game.game_information)
+
+	word_game = Game(word = game_info["word"], correct_guessed_letters = set(game_info["correct_guessed_letters"]),  
+		incorrect_guessed_letters = set(game_info["incorrect_guessed_letters"]), incorrect_guesses=game_info["incorrect_guesses"],
+		incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
 
 	secret_word = word_game.get_word()
 	
@@ -443,5 +446,5 @@ def get_rules():
 # if you run the file directly, will run code below
 if __name__ == "__main__": # pragma: no cover
 	connect_to_db(app)  # pragma: no cover
-	app.run() # pragma: no cover
+	app.run(debug=True) # pragma: no cover
 
