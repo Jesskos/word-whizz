@@ -411,6 +411,7 @@ def view_game_history():
 	sql = """SELECT word, won, score, date
 			FROM scores 
 			WHERE user_id= :user_id
+			AND completed != False
 			ORDER BY date DESC
 			"""
 
