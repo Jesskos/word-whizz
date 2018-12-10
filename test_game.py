@@ -26,15 +26,10 @@ class GameTestsWhilePlaying(unittest.TestCase):
 		''' sets the attributes in the init method to perform tests
 		Attributes set up to test the condition of neither winning or losing the game'''
 
-		self.word_game=Game()
-		self.word_game.word= "chocolate"
-		self.word_game.word_set = set(WinningGameTests.TEST_WORD)
-		self.word_game.correct_guessed_letters = set(['c', 'o'])
-		self.word_game.incorrect_guessed_letters = set(['i', 's'])
-		self.word_game.incorrect_guesses = 2 
-		self.word_game.max_incorrect_guesses = 6
+		self.word_game=Game(word="chocolate", correct_guessed_letters = set(['c', 'o']), incorrect_guessed_letters = set(['i', 's']),
+		  incorrect_guesses = 2, incorrect_words_guessed = set(["berry"]))
+
 		self.letters = ['c', 'f', 'g']
-		self.word_game.incorrect_words_guessed = set(["berry"])
 
 
 	def test_get_word(self):
@@ -85,6 +80,12 @@ class GameTestsWhilePlaying(unittest.TestCase):
 		self.assertEqual(self.word_game.already_guessed_word('berry'), True)
 
 
+	def test_is_already_guessed_word_for_word_not_already_guessed(self):
+		''' tests method already_guessed_word for a word which has not already guessed '''
+
+		self.assertEqual(self.word_game.already_guessed_word('cherry'), False)
+
+
 	def test_get_correct_guessed_letters(self):
 		''' tests that the set of correctly guessed letters is returned '''
 
@@ -94,7 +95,7 @@ class GameTestsWhilePlaying(unittest.TestCase):
 	def test_get_incorrect_guessed_letters(self):
 		''' tests that the set of incorrectly guessed letters is returned '''
 
-		self.assertEqual(self.word_game.get_incorrect_guessed_letters(), set(['i', 's']))
+		self.assertEqual(self.word_game.get_incorrectly_guessed_letters(), set(['i', 's']))
 
 
 	def test_guesses_left(self):
@@ -126,6 +127,13 @@ class GameTestsWhilePlaying(unittest.TestCase):
 
 		self.assertEqual(self.word_game.game_over(), False)
 
+
+	def test_check_word_when_word_incorrect(self):
+		''' checks a word when the word is not the correct word '''
+
+		self.word_game.check_word("cherry")
+		self.assertEqual(self.word_game.incorrect_guesses, 3)
+		self.assertIn("cherry", self.word_game.incorrect_words_guessed)
 
 
 class WinningGameTests(unittest.TestCase):
@@ -172,6 +180,11 @@ class WinningGameTests(unittest.TestCase):
 
 		self.assertEqual(self.word_game.get_score(), 156)
 
+
+	def test_check_word_when_word_correct(self):
+		''' checks a word when the word is the correct word '''
+
+		self.assertEqual(self.word_game.check_word("chocolate"), True)
 
 
 class LosingGameTests(unittest.TestCase):
