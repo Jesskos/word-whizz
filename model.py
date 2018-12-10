@@ -25,6 +25,7 @@ class Score(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 	date = db.Column(db.DateTime, nullable=False)
 	word = db.Column(db.String(20), nullable=False)
+	game_information = db.Column(db.String(100), nullable=False)
 	score = db.Column(db.Integer, nullable=False)
 	won = db.Column(db.Boolean, nullable=False)
 
