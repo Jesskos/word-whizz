@@ -419,7 +419,7 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 	# 		self.assertIn(b"Sorry, you have lost the game.", result.data)
 
 class testWinningGame(unittest.TestCase):
-	''' tests winning game when user guesses a letter '''
+	''' tests winning game when user guesses a correct letter or correct word '''
 
 	def setUp(self):
 		''' runs before each test '''
@@ -454,8 +454,16 @@ class testWinningGame(unittest.TestCase):
 		self.assertIn(b"You win!", result.data)
 
 
+	def test_for_win(self):
+		''' tests the user wins when entering a correct word'''
+
+		result = self.client.get("/check_word", query_string={'word': 'GRIT'})
+		self.assertIn(b"You Win!", result.data)
+
+
+
 class testGameOver(unittest.TestCase):
-	''' tests game over response when user has won or lost '''
+	''' tests game over response when user has already won or lost in routes check[_letter] and check_word '''
 
 	def setUp(self):
 		''' runs before each test '''
@@ -483,15 +491,21 @@ class testGameOver(unittest.TestCase):
 		db.drop_all()
 
 
-	def test_for_game_over(self):
+	def test_for_game_over_in_check(self):
 		''' tests for game over after a losing game '''
 
 		result = self.client.get("/check", query_string={'letter': 'i'})
 		self.assertIn(b"The game is over", result.data)
 
+	def test_for_game_over_in_check_word(self):
+		''' tests for game over after a losing game '''
+
+		result = self.client.get("/check_word", query_string={'word': 'over'})
+		self.assertIn(b"The game is over", result.data)
+
 
 class testLosingGame(unittest.TestCase):
-	''' tests losing game when user guesses a wrong letter '''
+	''' tests losing game when user guesses a wrong letter or wrong word  '''
 
 	def setUp(self):
 		''' runs before each test '''
@@ -526,6 +540,13 @@ class testLosingGame(unittest.TestCase):
 		self.assertIn(b"Sorry, you have lost the game.", result.data)
 
 
+	def test_for_loss(self):
+		''' tests the user loses when entering a wrong word after 5 guesses '''
+
+		result = self.client.get("/check_word", query_string={'word': 'jellys'})
+		self.assertIn(b"Sorry, you have lost the game", result.data)
+
+
 class testCheckWord(unittest.TestCase):
 	''' tests functionality of check_word '''
 
@@ -539,13 +560,10 @@ class testCheckWord(unittest.TestCase):
 		connect_to_db(app, "postgresql:///testdb")
 		db.create_all()
 		example_data()
-		
-		# adds a user to the session to carry out routes while logged in
-		user = User.query.filter_by(username='awesomewordguesses').first()
 
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = user.user_id
+				sess['user_id'] = 3
 				sess['difficulty_level'] = "3"
 				sess['name'] = user.username
 
@@ -555,20 +573,6 @@ class testCheckWord(unittest.TestCase):
 
 		db.session.close()
 		db.drop_all()
-
-
-	def test_for_game_over(self):
-		''' tests for game over '''
-
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 6
-		self.word_game.max_incorrect_guesses = 6
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/check_word", query_string={'word': 'apple'})
-			self.assertIn(b'The game is over.', result.data)
 
 
 	def test_for_word_length(self):
@@ -648,14 +652,17 @@ class testCheckWord(unittest.TestCase):
 def example_data():
 	''' creates some example data to test models'''
 
+	# sample game players
 	player1 = User(username="awesomewordguesses", password="123abc")
 	player2 = User(username="bestguesser", password="456def")
 	player3 = User(username="alwayswrite", password="789ghi")
 	player4 = User(username="notinterested", password="567")
 	player5 = User(username="notgivingup", password="words")
+
+	# sample games 
 	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True, completed=False, 
 		game_information='{"word": "arduous", "correct_guessed_letters": ["a"], "incorrect_guessed_letters": ["i"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=True, completed=False, 
+	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=False, completed=False, 
 		game_information='{"word": "joyful", "correct_guessed_letters": ["j"], "incorrect_guessed_letters": ["z", "e", "i", "p", "s"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
 	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False, completed=False, 
 		game_information='{"word": "tedious", "correct_guessed_letters": ["t", "e"], "incorrect_guessed_letters": ["s", "a"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
@@ -665,7 +672,7 @@ def example_data():
 		game_information='{"word": "crystal", "correct_guessed_letters": ["c", "a", "l"], "incorrect_guessed_letters": ["i", "e", "o", "p", "w"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
 	score6 = Score(user=player3, date=datetime.now(), score=0, word="um", won=False, completed=True, 
 		game_information='{"word": "um", "correct_guessed_letters": [], "incorrect_guessed_letters": ["i", "e", "o", "p", "w", "d"], "incorrect_guesses": 6, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score7 = Score(user=player5, date=datetime.now(), score=200, word="grit", won=False, completed=False, 
+	score7 = Score(user=player5, date=datetime.now(), score=0, word="grit", won=False, completed=False, 
 		game_information='{"word": "grit", "correct_guessed_letters": ["g", "r", "t"], "incorrect_guessed_letters": ["e"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
 	
 
