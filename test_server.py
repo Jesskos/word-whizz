@@ -385,32 +385,11 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		self.assertIn(b"invalid input", result.data)
 
 
-	# def test_game_over(self):
-	# 	''' tests that the game is over when conditions for game over met'''
-
-	# 	result = self.client.get("/check")
-	# 	self.assertIn(b"The game is over. Please choose to play again", result.data)
-	
-
 	def test_letter_already_guessed(self):
 		''' tests for correct response with a letter already guessed'''
 
 		result = self.client.get("/check", query_string={'letter': 'I'})
 		self.assertIn(b"You already guessed the letter i", result.data)
-
-
-	# def test_for_win(self):
-	# 	''' tests the user wins when entering a letter'''
-
-	# 	self.word_game = Game()
-	# 	self.word_game.word = "berry"
-	# 	self.word_game.correct_guessed_letters = set(['e', 'b', 'y'])
-	# 	self.word_game.word_set = set(list(self.word_game.word))
-	# 	self.users_playing = {1:self.word_game}
-
-	# 	with patch('server.users_playing',self.users_playing):
-	# 		result = self.client.get("/check", query_string={'letter': 'r'})
-	# 		self.assertIn(b"You win!", result.data)
 
 
 	def test_for_correct_guess(self):
@@ -438,6 +417,114 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 	# 	with patch('server.users_playing',self.users_playing):
 	# 		result = self.client.get("/check", query_string={'letter': 't'})
 	# 		self.assertIn(b"Sorry, you have lost the game.", result.data)
+
+class testWinningGame(unittest.TestCase):
+	''' tests winning game when user guesses a letter '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = 5
+				sess["game_id"] = 7
+				sess['difficulty_level'] = "3"
+				sess['name'] ="teddy"
+
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_for_win(self):
+		''' tests the user wins when entering a letter'''
+
+		result = self.client.get("/check", query_string={'letter': 'i'})
+		self.assertIn(b"You win!", result.data)
+
+
+class testGameOver(unittest.TestCase):
+	''' tests game over response when user has won or lost '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = 4
+				sess["game_id"] = 6
+				sess['difficulty_level'] = "3"
+				sess['name'] ="teddy"
+
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_for_game_over(self):
+		''' tests for game over after a losing game '''
+
+		result = self.client.get("/check", query_string={'letter': 'i'})
+		self.assertIn(b"The game is over", result.data)
+
+
+class testLosingGame(unittest.TestCase):
+	''' tests losing game when user guesses a wrong letter '''
+
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = 1
+				sess["game_id"] = 2
+				sess['difficulty_level'] = "3"
+				sess['name'] ="teddy"
+
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_for_loss(self):
+		''' tests the user loses when entering a wrong letter after 5 guesses '''
+
+		result = self.client.get("/check", query_string={'letter': 'm'})
+		self.assertIn(b"Sorry, you have lost the game.", result.data)
+
 
 class testCheckWord(unittest.TestCase):
 	''' tests functionality of check_word '''
@@ -565,24 +652,28 @@ def example_data():
 	player2 = User(username="bestguesser", password="456def")
 	player3 = User(username="alwayswrite", password="789ghi")
 	player4 = User(username="notinterested", password="567")
-	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True, completed=True, 
+	player5 = User(username="notgivingup", password="words")
+	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True, completed=False, 
 		game_information='{"word": "arduous", "correct_guessed_letters": ["a"], "incorrect_guessed_letters": ["i"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=True, completed=True, 
-		game_information='{"word": "joyful", "correct_guessed_letters": ["j"], "incorrect_guessed_letters": ["z"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False, completed=True, 
+	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=True, completed=False, 
+		game_information='{"word": "joyful", "correct_guessed_letters": ["j"], "incorrect_guessed_letters": ["z", "e", "i", "p", "s"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False, completed=False, 
 		game_information='{"word": "tedious", "correct_guessed_letters": ["t", "e"], "incorrect_guessed_letters": ["s", "a"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score4 = Score(user=player2, date=datetime.now(), score=500, word="alacrity", won=True, completed=True, 
+	score4 = Score(user=player2, date=datetime.now(), score=500, word="alacrity", won=False, completed=False, 
 		game_information='{"word": "alacrity", "correct_guessed_letters": ["a", "i"], "incorrect_guessed_letters": ["s", "e"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score5 = Score(user=player3, date=datetime.now(), score=20, word="crystal", won=False, completed=True, 
+	score5 = Score(user=player3, date=datetime.now(), score=20, word="crystal", won=False, completed=False, 
 		game_information='{"word": "crystal", "correct_guessed_letters": ["c", "a", "l"], "incorrect_guessed_letters": ["i", "e", "o", "p", "w"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
 	score6 = Score(user=player3, date=datetime.now(), score=0, word="um", won=False, completed=True, 
 		game_information='{"word": "um", "correct_guessed_letters": [], "incorrect_guessed_letters": ["i", "e", "o", "p", "w", "d"], "incorrect_guesses": 6, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score7 = Score(user=player5, date=datetime.now(), score=200, word="grit", won=False, completed=False, 
+		game_information='{"word": "grit", "correct_guessed_letters": ["g", "r", "t"], "incorrect_guessed_letters": ["e"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	
 
-	players = [player1, player2, player3, player4]
-	scores = [score1, score2, score3, score4, score5]
+	players = [player1, player2, player3, player4, player5]
+	scores = [score1, score2, score3, score4, score5, score6, score7]
 
-	db.session.add_all(players[:])
-	db.session.add_all(scores[:])
+	db.session.add_all(players)
+	db.session.add_all(scores)
 	db.session.commit()
 
 
