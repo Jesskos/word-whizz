@@ -262,45 +262,6 @@ class ServerTestsPlay(unittest.TestCase):
 		self.assertIn(b"<span id=2>___</span>", result.data)
 
 
-	def test_route_play_after_user_loses(self):
-		''' tests_route_play after user loses '''
-
-
-		def setUp(self):
-			''' runs before each test '''	
-
-			score_record = Score.query.get(3)
-			game_info = json.loads(score_record.game_information)
-			word_game = Game(word = game_info["word"], correct_guessed_letters = set(game_info["correct_guessed_letters"]),  
-			incorrect_guessed_letters = set(game_info["incorrect_guessed_letters"]), incorrect_guesses=game_info["incorrect_guesses"],
-			incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
-			word_game.check_letter('b')
-			word_game.check_letter('c')
-			word_game.check_letter('a')
-			word_game.check_letter('g')
-			new_game_info = word_game.stringify_attributes()
-			score_record.game_information = new_game_info
-			db.session.commit()
-			self.assertEqual(word_game.guesses_left(), 0)
-			self.assertEqual(word_game.lose(), True)
-
-
-		def test_play(self):
-			result = self.client.get("/play")
-			self.assertIn(b"<span id=0>t</span>", result.data)
-			self.assertIn(b"<span id=1>e</span>", result.data)
-			self.assertIn(b"<span id=2>d</span>", result.data)
-			self.assertIn(b"<span id=3>i</span>", result.data)
-			self.assertIn(b"<span id=4>o</span>", result.data)
-			self.assertIn(b"<span id=5>u</span>", result.data)
-			self.assertIn(b"<span id=6>s</span>", result.data)
-
-		def tearDown(self):
-			''' runs after each test '''
-
-			db.session.close()
-			db.drop_all()
-
 class ServerTestsPlayWhenLose(unittest.TestCase):
 	''' A series of tests to make sure that when page renders, letter locations on board are maintained '''
 
@@ -358,7 +319,7 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 		#'mocking' session id
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = 1
+				sess['user_id'] = 2
 				sess['difficulty_level'] = "3"
 				sess['name'] = 'teddy'
 				sess['game_id'] = 3
@@ -373,28 +334,18 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 	def test_new_difficulty_level(self):
 		''' makes sure a thatt when the user selects a new difficulty level, the difficulty level updates '''
 
-		# mocking guessed letters
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/play_again", query_string={'difficulty-level': '8'})
-			self.assertIn(b'"difficulty_level": "8"', result.data)
-			self.assertNotIn(b"3", result.data)
+		result = self.client.get("/play_again", query_string={'difficulty-level': '8'})
+		self.assertIn(b'"difficulty_level": "8"', result.data)
+		self.assertNotIn(b"3", result.data)
 
 
 	def test_no_change_difficulty_level(self):
 		''' makes sure a that when the user selects no difficulty level, the difficulty level does not update '''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.users_playing = {1:self.word_game}
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/play_again", query_string={'difficulty-level': ''})
-			self.assertIn(b'"difficulty_level": "3"', result.data)
-			self.assertNotIn(b'"difficulty_level": "8"', result.data)
-
+		result = self.client.get("/play_again", query_string={'difficulty-level': ''})
+		self.assertIn(b'"difficulty_level": "3"', result.data)
+		self.assertNotIn(b'"difficulty_level": "8"', result.data)
+		payload = {"difficulty": "8"}
 
 
 class ServerTestsCheckGameLogic(unittest.TestCase):
