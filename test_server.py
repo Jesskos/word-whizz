@@ -345,7 +345,7 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 		result = self.client.get("/play_again", query_string={'difficulty-level': ''})
 		self.assertIn(b'"difficulty_level": "3"', result.data)
 		self.assertNotIn(b'"difficulty_level": "8"', result.data)
-		payload = {"difficulty": "8"}
+
 
 
 class ServerTestsCheckGameLogic(unittest.TestCase):
@@ -362,15 +362,13 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		connect_to_db(app, "postgresql:///testdb")
 		db.create_all()
 		example_data()
-		
-		# adds a user to the session to carry out routes while logged in
-		user = User.query.filter_by(username='awesomewordguesses').first()
 
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = user.user_id
+				sess['user_id'] = 1
+				sess["game_id"] = 1
 				sess['difficulty_level'] = "3"
-				sess['name'] = user.username
+				sess['name'] ="teddy"
 
 
 	def tearDown(self):
@@ -383,99 +381,63 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 	def test_invalid_letter_input(self):
 		''' tests that when a letter input is invalid, the server reponds correctly'''
 		
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.users_playing = {1:self.word_game}
+		result = self.client.get("/check", query_string={'letter': 'a1'})
+		self.assertIn(b"invalid input", result.data)
 
 
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check", query_string={'letter': 'a1'})
-			self.assertIn(b"invalid input", result.data)
+	# def test_game_over(self):
+	# 	''' tests that the game is over when conditions for game over met'''
 
-
-	def test_game_over(self):
-		''' tests that the game is over when conditions for game over met'''
-
-		# mocking guessed letters
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.correct_guessed_letters = set(['r', 'e', 'b', 'y'])
-		self.word_game.word_set = set(list(self.word_game.word))
-		self.users_playing = {1:self.word_game}
-
-		# substitutes server word game with mock word game
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check")
-			self.assertIn(b"The game is over. Please choose to play again", result.data)
+	# 	result = self.client.get("/check")
+	# 	self.assertIn(b"The game is over. Please choose to play again", result.data)
 	
 
 	def test_letter_already_guessed(self):
 		''' tests for correct response with a letter already guessed'''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.correct_guessed_letters = set(['r', 'e', 'b'])
-		self.word_game.incorrect_guessed_letters = set(['y'])
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check", query_string={'letter': 'Y'})
-			self.assertIn(b"You already guessed the letter y", result.data)
+		result = self.client.get("/check", query_string={'letter': 'I'})
+		self.assertIn(b"You already guessed the letter i", result.data)
 
 
-	def test_for_win(self):
-		''' tests the user wins when entering a letter'''
+	# def test_for_win(self):
+	# 	''' tests the user wins when entering a letter'''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.correct_guessed_letters = set(['e', 'b', 'y'])
-		self.word_game.word_set = set(list(self.word_game.word))
-		self.users_playing = {1:self.word_game}
+	# 	self.word_game = Game()
+	# 	self.word_game.word = "berry"
+	# 	self.word_game.correct_guessed_letters = set(['e', 'b', 'y'])
+	# 	self.word_game.word_set = set(list(self.word_game.word))
+	# 	self.users_playing = {1:self.word_game}
 
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check", query_string={'letter': 'r'})
-			self.assertIn(b"You win!", result.data)
+	# 	with patch('server.users_playing',self.users_playing):
+	# 		result = self.client.get("/check", query_string={'letter': 'r'})
+	# 		self.assertIn(b"You win!", result.data)
 
 
 	def test_for_correct_guess(self):
 		''' tests for correct guess where player does not win '''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.correct_guessed_letters = set(['e', 'y'])
-		self.word_game.word_set = set(list(self.word_game.word))
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check", query_string={'letter': 'b'})
-			self.assertIn(b"Great Work! Correct Guess!", result.data)
+		result = self.client.get("/check", query_string={'letter': 'u'})
+		self.assertIn(b"Great Work! Correct Guess!", result.data)
 
 
 	def test_for_wrong_guess(self):
 		''' tests for a wrong guess where player does not lose '''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 2
-		self.word_game.max_incorrect_guesses = 6
-		self.users_playing = {1:self.word_game}
+		result = self.client.get("/check", query_string={'letter': 'e'})
+		self.assertIn(b"Sorry, Incorrect Guess! e is not in the word.", result.data)
 
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check", query_string={'letter': 't'})
-			self.assertIn(b"Sorry, Incorrect Guess! t is not in the word.", result.data)
+	# def test_for_lose(self):
+	# 	''' tests if user loses after entering a letter '''
 
-	def test_for_lose(self):
-		''' tests if user loses after entering a letter '''
+	# 	self.word_game = Game()
+	# 	self.word_game.word = "berry"
+	# 	self.word_game.incorrect_guesses = 5
+	# 	self.word_game.max_incorrect_guesses = 6
+	# 	self.users_playing = {1:self.word_game}
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 5
-		self.word_game.max_incorrect_guesses = 6
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing',self.users_playing):
-			result = self.client.get("/check", query_string={'letter': 't'})
-			self.assertIn(b"Sorry, you have lost the game.", result.data)
+	# 	with patch('server.users_playing',self.users_playing):
+	# 		result = self.client.get("/check", query_string={'letter': 't'})
+	# 		self.assertIn(b"Sorry, you have lost the game.", result.data)
 
 class testCheckWord(unittest.TestCase):
 	''' tests functionality of check_word '''
