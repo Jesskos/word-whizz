@@ -461,7 +461,6 @@ class testWinningGame(unittest.TestCase):
 		self.assertIn(b"You Win!", result.data)
 
 
-
 class testGameOver(unittest.TestCase):
 	''' tests game over response when user has already won or lost in routes check[_letter] and check_word '''
 
@@ -563,9 +562,10 @@ class testCheckWord(unittest.TestCase):
 
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = 3
+				sess['user_id'] = 1
+				sess['game_id'] = 1
 				sess['difficulty_level'] = "3"
-				sess['name'] = user.username
+				sess['name'] = "teddy"
 
 
 	def tearDown(self):
@@ -575,76 +575,33 @@ class testCheckWord(unittest.TestCase):
 		db.drop_all()
 
 
-	def test_for_word_length(self):
-		''' tests that server does not accept word guess that is not equal to secret word '''
-
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 6
-		self.word_game.max_incorrect_guesses = 4
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/check_word", query_string={'word': 'cherry'})
-			self.assertIn(b"Invalid entry! make sure your guess is the same length as the secret word", result.data)
-
-
 	def test_for_only_alpha_input(self):
 		'''tests that server only accepts letters '''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 6
-		self.word_game.max_incorrect_guesses = 4
-		self.users_playing = {1:self.word_game}
 
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/check_word", query_string={'word': "b3rry"})
-			self.assertIn(b"invalid input", result.data)
-
-
-	def test_winning_game(self):
-		''' tests for correct response when user wins by guessing right word '''
-
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 6
-		self.word_game.max_incorrect_guesses = 5
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/check_word", query_string={'word': 'berry'})
-			self.assertIn(b"You Win! You guessed the word correctly", result.data)
-			self.assertIn(b"berry", result.data)
-
-	def test_losing_game(self):
-		''' tests for correct response when user loses by guessing wrong word'''
-
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 5
-		self.word_game.max_incorrect_guesses = 6
-		self.users_playing = {1:self.word_game}
-
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/check_word", query_string={'word': 'ferry'})
-			self.assertIn(b"you have lost the game", result.data)
-			self.assertIn(b"berry", result.data)
+		result = self.client.get("/check_word", query_string={'word': "b3rries"})
+		self.assertIn(b"invalid input", result.data)
 
 
 	def test_wrong_word(self):
 		''' tests user guessed wrong word but has not lost'''
 
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.incorrect_guesses = 4
-		self.word_game.max_incorrect_guesses = 6
-		self.users_playing = {1:self.word_game}
+		result = self.client.get("/check_word", query_string={'word': 'arduino'})
+		self.assertIn(b"Sorry, your guess was incorrect", result.data)
 
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/check_word", query_string={'word': 'ferry'})
-			self.assertIn(b"Sorry, your guess was incorrect", result.data)
 
+	def test_wrong_length(self):
+		''' tests length was incorrect '''
+
+		result = self.client.get("/check_word", query_string={'word': 'ardent'})
+		self.assertIn(b"make sure your guess is the same length as the secret word", result.data)
+
+
+	def test_word_already_guessed(self):
+		''' tests length was incorrect '''
+
+		result = self.client.get("/check_word", query_string={'word': 'ambient'})
+		self.assertIn(b"word already guessed", result.data)
 
 ##################################################################################
 #############################################################################################################################
@@ -661,7 +618,7 @@ def example_data():
 
 	# sample games 
 	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True, completed=False, 
-		game_information='{"word": "arduous", "correct_guessed_letters": ["a"], "incorrect_guessed_letters": ["i"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+		game_information='{"word": "arduous", "correct_guessed_letters": ["a"], "incorrect_guessed_letters": ["i"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": ["ambient"]}')
 	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=False, completed=False, 
 		game_information='{"word": "joyful", "correct_guessed_letters": ["j"], "incorrect_guessed_letters": ["z", "e", "i", "p", "s"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
 	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False, completed=False, 
