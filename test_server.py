@@ -436,14 +436,14 @@ class testWinningGame(unittest.TestCase):
 		db.drop_all()
 
 
-	def test_for_win(self):
+	def test_for_win_check_letter_letter(self):
 		''' tests the user wins when entering a letter'''
 
 		result = self.client.get("/check", query_string={'letter': 'i'})
 		self.assertIn(b"You win!", result.data)
 
 
-	def test_for_win(self):
+	def test_for_win_check_word(self):
 		''' tests the user wins when entering a correct word'''
 
 		result = self.client.get("/check_word", query_string={'word': 'GRIT'})
@@ -485,6 +485,7 @@ class testGameOver(unittest.TestCase):
 		result = self.client.get("/check", query_string={'letter': 'i'})
 		self.assertIn(b"The game is over", result.data)
 
+
 	def test_for_game_over_in_check_word(self):
 		''' tests for game over after a losing game '''
 
@@ -521,14 +522,14 @@ class testLosingGame(unittest.TestCase):
 		db.drop_all()
 
 
-	def test_for_loss(self):
+	def test_for_loss_check_letter(self):
 		''' tests the user loses when entering a wrong letter after 5 guesses '''
 
 		result = self.client.get("/check", query_string={'letter': 'm'})
 		self.assertIn(b"Sorry, you have lost the game.", result.data)
 
 
-	def test_for_loss(self):
+	def test_for_loss_check_word(self):
 		''' tests the user loses when entering a wrong word after 5 guesses '''
 
 		result = self.client.get("/check_word", query_string={'word': 'jellys'})
