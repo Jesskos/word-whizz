@@ -33,6 +33,7 @@ class ServerTestsLoggedIn(unittest.TestCase):
 				sess['user_id'] = 1
 				sess['difficulty_level'] = "3"
 				sess['name'] = 'teddy'
+				sess['game_id'] = 3
 
 
 	def tearDown(self):
@@ -86,17 +87,12 @@ class ServerTestsLoggedIn(unittest.TestCase):
 
 	def test_log_out_when_logged_in(self):
 		''' tests log out functionality ''' 
+		
+		result = self.client.get("/logout", follow_redirects=True)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
+		self.assertIn(b"You have now logged out", result.data)
 
-		# added to log out test since user's word game is removed from users playing when 
-		#
-		self.word_game = Game()
-		self.users_playing = {1:self.word_game}
-
-		# makes sure guessed letters are  in html
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/logout", follow_redirects=True)
-			self.assertIn(b"Sign Up/Log In Page", result.data)
-			self.assertEqual(result.status_code, 200)
+		self.assertEqual(result.status_code, 200)
 
 	def test_rules(self):
 		''' tests rules'''
@@ -608,11 +604,11 @@ def example_data():
 	player2 = User(username="bestguesser", password="456def")
 	player3 = User(username="alwayswrite", password="789ghi")
 	player4 = User(username="notinterested", password="567")
-	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True)
-	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=True)
-	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False)
-	score4 = Score(user=player2, date=datetime.now(), score=500, word="alacrity", won=True)
-	score5 = Score(user=player3, date=datetime.now(), score=20, word="crystal", won=False)
+	score1 = Score(user=player1, date=datetime.now(), score=200, word="arduous", won=True, completed=True, game_information="")
+	score2 = Score(user=player1, date=datetime.now(), score=300, word="joyful", won=True, completed=True, game_information="")
+	score3 = Score(user=player2, date=datetime.now(), score=10, word="tedious", won=False, completed=True, game_information="")
+	score4 = Score(user=player2, date=datetime.now(), score=500, word="alacrity", won=True, completed=True, game_information="")
+	score5 = Score(user=player3, date=datetime.now(), score=20, word="crystal", won=False, completed=True, game_information="")
 
 	players = [player1, player2, player3, player4]
 	scores = [score1, score2, score3, score4, score5]
