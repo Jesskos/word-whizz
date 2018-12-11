@@ -229,8 +229,6 @@ class ServerTestsPlay(unittest.TestCase):
 		connect_to_db(app, "postgresql:///testdb")
 		db.create_all()
 		example_data()
-		
-
 
 		# adds a user to the session to carry out routes while logged in
 		# user = User.query.filter_by(username='awesomewordguesses').first()
@@ -238,15 +236,15 @@ class ServerTestsPlay(unittest.TestCase):
 		with self.client as c:
 			with c.session_transaction() as sess:
 				sess['user_id'] = 2
-				sess['game_id'] = 3
+				sess['game_id'] = 4
 				sess['difficulty_level'] = "3"
 				sess['name'] = 'teddy'
 
-	def tearDown(self):
-		''' runs after each test '''
+	# def tearDown(self):
+	# 	''' runs after each test '''
 
-		db.session.close()
-		db.drop_all()
+	# 	db.session.close()
+	# 	db.drop_all()
 
 
 	def test_route_play(self):
@@ -281,7 +279,7 @@ class ServerTestsPlayWhenLose(unittest.TestCase):
 		with self.client as c:
 			with c.session_transaction() as sess:
 				sess['user_id'] = 3
-				sess['game_id'] = 6
+				sess['game_id'] = 7
 				sess['difficulty_level'] = "3"
 				sess['name'] = 'teddy'
 
@@ -401,18 +399,6 @@ class ServerTestsCheckGameLogic(unittest.TestCase):
 		result = self.client.get("/check", query_string={'letter': 'e'})
 		self.assertIn(b"Sorry, Incorrect Guess! e is not in the word.", result.data)
 
-	# def test_for_lose(self):
-	# 	''' tests if user loses after entering a letter '''
-
-	# 	self.word_game = Game()
-	# 	self.word_game.word = "berry"
-	# 	self.word_game.incorrect_guesses = 5
-	# 	self.word_game.max_incorrect_guesses = 6
-	# 	self.users_playing = {1:self.word_game}
-
-	# 	with patch('server.users_playing',self.users_playing):
-	# 		result = self.client.get("/check", query_string={'letter': 't'})
-	# 		self.assertIn(b"Sorry, you have lost the game.", result.data)
 
 class testWinningGame(unittest.TestCase):
 	''' tests winning game when user guesses a correct letter or correct word '''
@@ -431,7 +417,7 @@ class testWinningGame(unittest.TestCase):
 		with self.client as c:
 			with c.session_transaction() as sess:
 				sess['user_id'] = 5
-				sess["game_id"] = 7
+				sess["game_id"] = 8
 				sess['difficulty_level'] = "3"
 				sess['name'] ="teddy"
 
@@ -474,7 +460,7 @@ class testGameOver(unittest.TestCase):
 		with self.client as c:
 			with c.session_transaction() as sess:
 				sess['user_id'] = 4
-				sess["game_id"] = 6
+				sess["game_id"] = 7
 				sess['difficulty_level'] = "3"
 				sess['name'] ="teddy"
 
@@ -617,20 +603,20 @@ def example_data():
 		game_information='{"word": "arduous", "correct_guessed_letters": ["a"], "incorrect_guessed_letters": ["i"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": ["ambient"]}')
 	score2 = Score(user=player1, date=datetime.now(), score=0, word="joyful", won=False, completed=False, 
 		game_information='{"word": "joyful", "correct_guessed_letters": ["j"], "incorrect_guessed_letters": ["z", "e", "i", "p", "s"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score3 = Score(user=player2, date=datetime.now(), score=0, word="tedious", won=False, completed=False, 
-		game_information='{"word": "tedious", "correct_guessed_letters": ["t", "e"], "incorrect_guessed_letters": ["s", "a"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score4 = Score(user=player2, date=datetime.now(), score=0, word="alacrity", won=False, completed=False, 
-		game_information='{"word": "alacrity", "correct_guessed_letters": ["a", "i"], "incorrect_guessed_letters": ["s", "e"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score5 = Score(user=player3, date=datetime.now(), score=0, word="crystal", won=False, completed=False, 
-		game_information='{"word": "crystal", "correct_guessed_letters": ["c", "a", "l"], "incorrect_guessed_letters": ["i", "e", "o", "p", "w"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score6 = Score(user=player3, date=datetime.now(), score=0, word="um", won=False, completed=True, 
-		game_information='{"word": "um", "correct_guessed_letters": [], "incorrect_guessed_letters": ["i", "e", "o", "p", "w", "d"], "incorrect_guesses": 6, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score7 = Score(user=player5, date=datetime.now(), score=0, word="grit", won=False, completed=False, 
-		game_information='{"word": "grit", "correct_guessed_letters": ["g", "r", "t"], "incorrect_guessed_letters": ["e"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score8 = Score(user=player5, date=datetime.now(), score=200, word="", won=True, completed=True, 
-		game_information='{"word": "resilience", "correct_guessed_letters": ["r", "e", "s", "i", "l", "n", "c"], "incorrect_guessed_letters": ["w", "z", "y", "m"], "incorrect_guesses": 4, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
-	score9 = Score(user=player1, date=datetime.now(), score=150, word="success", won=True, completed=True, 
+	score3 = Score(user=player1, date=datetime.now(), score=150, word="success", won=True, completed=True, 
 		game_information='{"word": "success", "correct_guessed_letters": ["s", "u", "c", "e"], "incorrect_guessed_letters": ["a"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score4 = Score(user=player2, date=datetime.now(), score=0, word="tedious", won=False, completed=False, 
+		game_information='{"word": "tedious", "correct_guessed_letters": ["t", "e"], "incorrect_guessed_letters": ["s", "a"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score5 = Score(user=player2, date=datetime.now(), score=0, word="alacrity", won=False, completed=False, 
+		game_information='{"word": "alacrity", "correct_guessed_letters": ["a", "i"], "incorrect_guessed_letters": ["s", "e"], "incorrect_guesses": 2, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score6 = Score(user=player3, date=datetime.now(), score=0, word="crystal", won=False, completed=False, 
+		game_information='{"word": "crystal", "correct_guessed_letters": ["c", "a", "l"], "incorrect_guessed_letters": ["i", "e", "o", "p", "w"], "incorrect_guesses": 5, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score7 = Score(user=player3, date=datetime.now(), score=0, word="um", won=False, completed=True, 
+		game_information='{"word": "um", "correct_guessed_letters": [], "incorrect_guessed_letters": ["i", "e", "o", "p", "w", "d"], "incorrect_guesses": 6, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score8 = Score(user=player5, date=datetime.now(), score=0, word="grit", won=False, completed=False, 
+		game_information='{"word": "grit", "correct_guessed_letters": ["g", "r", "t"], "incorrect_guessed_letters": ["e"], "incorrect_guesses": 1, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
+	score9 = Score(user=player5, date=datetime.now(), score=200, word="", won=True, completed=True, 
+		game_information='{"word": "resilience", "correct_guessed_letters": ["r", "e", "s", "i", "l", "n", "c"], "incorrect_guessed_letters": ["w", "z", "y", "m"], "incorrect_guesses": 4, "max_incorrect_guesses": 6, "incorrect_words_guessed": []}')
 	
 
 	players = [player1, player2, player3, player4, player5]
