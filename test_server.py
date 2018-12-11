@@ -141,7 +141,14 @@ class ServerTestsNotLoggedIn(unittest.TestCase):
 		result = self.client.get("/view_history", follow_redirects=True)
 		self.assertIn(b"Sign Up/Log In Page", result.data)
 		self.assertEqual(result.status_code, 200)
-		
+	
+
+	def test_view_game_rules(self):
+		''' Integratin test to make sure rules does not render unless user is logged in'''
+
+		result = self.client.get("/game_rules", follow_redirects=True)
+		self.assertIn(b"Sign Up/Log In Page", result.data)
+		self.assertEqual(result.status_code, 200)
 
 	def test_view_leaderboard_route(self):
 		''' Integratin test to make sure leadboard route renders correct information when user is not logged in'''
