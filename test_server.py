@@ -241,7 +241,8 @@ class ServerTestsPlay(unittest.TestCase):
 
 		with self.client as c:
 			with c.session_transaction() as sess:
-				sess['user_id'] = 1
+				sess['user_id'] = 2
+				sess['game_id'] = 3
 				sess['difficulty_level'] = "3"
 				sess['name'] = 'teddy'
 
@@ -255,43 +256,89 @@ class ServerTestsPlay(unittest.TestCase):
 	def test_route_play(self):
 		''' tests_route_play to make sure html renders appropriately'''
 
-		# mocking guessed letters
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.correct_guessed_letters = set(['r', 'e'])
-		self.users_playing = {1:self.word_game}
-
-		# makes sure guessed letters are  in html
-		with patch('server.users_playing', self.users_playing):
-			result = self.client.get("/play")
-			self.assertIn(b"<span id=3>r</span>", result.data)
-			self.assertIn(b"<span id=2>r</span>", result.data)
-			self.assertIn(b"<span id=1>e</span>", result.data)
-			self.assertIn(b"<span id=0>___</span>", result.data)
-			self.assertNotIn(b"<span id=0>b</span>", result.data)
+		result = self.client.get("/play")
+		self.assertIn(b"<span id=0>t</span>", result.data)
+		self.assertIn(b"<span id=1>e</span>", result.data)
+		self.assertIn(b"<span id=2>___</span>", result.data)
 
 
 	def test_route_play_after_user_loses(self):
 		''' tests_route_play after user loses '''
 
-		# mocking guessed letters
-		self.word_game = Game()
-		self.word_game.word = "berry"
-		self.word_game.correct_guessed_letters = set(['b', 'e'])
-		self.word_game.max_incorrect_guesses = 6
-		self.word_game.incorrect_guesses = 6
-		self.users_playing = {1:self.word_game}
 
-		with patch('server.users_playing',self.users_playing):
+		def setUp(self):
+			''' runs before each test '''	
+
+			score_record = Score.query.get(3)
+			game_info = json.loads(score_record.game_information)
+			word_game = Game(word = game_info["word"], correct_guessed_letters = set(game_info["correct_guessed_letters"]),  
+			incorrect_guessed_letters = set(game_info["incorrect_guessed_letters"]), incorrect_guesses=game_info["incorrect_guesses"],
+			incorrect_words_guessed = set(game_info["incorrect_words_guessed"]))
+			word_game.check_letter('b')
+			word_game.check_letter('c')
+			word_game.check_letter('a')
+			word_game.check_letter('g')
+			new_game_info = word_game.stringify_attributes()
+			score_record.game_information = new_game_info
+			db.session.commit()
+			self.assertEqual(word_game.guesses_left(), 0)
+			self.assertEqual(word_game.lose(), True)
+
+
+		def test_play(self):
 			result = self.client.get("/play")
-			self.assertEqual(self.word_game.guesses_left(), 0)
-			outcome = self.word_game.lose()
-			self.assertEqual(outcome, True)
-			self.assertIn(b"<span id=0>b</span>", result.data)
+			self.assertIn(b"<span id=0>t</span>", result.data)
 			self.assertIn(b"<span id=1>e</span>", result.data)
-			self.assertIn(b"<span id=2>r</span>", result.data)
-			self.assertIn(b"<span id=3>r</span>", result.data)
-			self.assertIn(b"<span id=4>y</span>", result.data)
+			self.assertIn(b"<span id=2>d</span>", result.data)
+			self.assertIn(b"<span id=3>i</span>", result.data)
+			self.assertIn(b"<span id=4>o</span>", result.data)
+			self.assertIn(b"<span id=5>u</span>", result.data)
+			self.assertIn(b"<span id=6>s</span>", result.data)
+
+		def tearDown(self):
+			''' runs after each test '''
+
+			db.session.close()
+			db.drop_all()
+
+class ServerTestsPlayWhenLose(unittest.TestCase):
+	''' A series of tests to make sure that when page renders, letter locations on board are maintained '''
+
+	
+	def setUp(self):
+		''' runs before each test '''
+
+		# test_client simulates that the server is running
+		# app defined inside server
+		app.config['TESTING'] = True
+		self.client = app.test_client()
+		connect_to_db(app, "postgresql:///testdb")
+		db.create_all()
+		example_data()
+		
+
+
+		# adds a user to the session to carry out routes while logged in
+		# user = User.query.filter_by(username='awesomewordguesses').first()
+
+		with self.client as c:
+			with c.session_transaction() as sess:
+				sess['user_id'] = 3
+				sess['game_id'] = 6
+				sess['difficulty_level'] = "3"
+				sess['name'] = 'teddy'
+
+	def tearDown(self):
+		''' runs after each test '''
+
+		db.session.close()
+		db.drop_all()
+
+
+	def test_play_after_losing_game(self):
+		result = self.client.get("/play")
+		self.assertIn(b"<span id=0>u</span>", result.data)
+		self.assertIn(b"<span id=1>m</span>", result.data)
 
 
 class ServerTestsDifficultyLevel(unittest.TestCase):
@@ -314,6 +361,7 @@ class ServerTestsDifficultyLevel(unittest.TestCase):
 				sess['user_id'] = 1
 				sess['difficulty_level'] = "3"
 				sess['name'] = 'teddy'
+				sess['game_id'] = 3
 
 	def tearDown(self):
 		''' runs after each test '''
