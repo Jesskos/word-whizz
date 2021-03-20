@@ -7,7 +7,7 @@ Flask-DebugToolbar==0.10.0
 Flask-SQLAlchemy==2.2
 idna==2.6
 itsdangerous==0.24
-Jinja2==2.7.3
+Jinja2==2.11.3
 linecache2==1.0.0
 MarkupSafe==1.1.0
 psycopg2==2.7.6
